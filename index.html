@@ -1785,6 +1785,100 @@ lkFix();
 
 </script>
 <script>
+/* ═══════════ معايرة LogiKal (قوائم القص الحقيقية OBJ01876 + OBJ01862) ═══════════
+   النظام يحسب القص والزجاج بنفس معادلات LogiKal للسلاسل: WD37 · WD50T · WD70T · S38T · HS55T · FS50 */
+const LKCAL_V=3;
+const LKCAL={
+  ak_wd37:{grid:1,F:36.5,Mv:24,Mh:45,ov:5.8,ovH:5.8,bd:22,g0:10,
+    win:{sb:82,sbV:126},door:{sb:146,sbV:215,noSill:1,gap:10,bot:146},
+    code:{frame:"708",sash:"710",dsash:"692",mullV:"713",mullH:"714",bead:"770",bot:"715"}},
+  ak_wd50t:{grid:1,F:36,Mv:36,Mh:36,ov:6,ovH:6,bd:22,g0:10,
+    win:{sb:86,sbV:130},door:{sb:148,sbV:192},
+    code:{frame:"643-644",sash:"647-648",dsash:"651-652",mullV:"657-658",mullH:"657-658",bead:"664"}},
+  ak_wd70t:{grid:1,F:40,Mv:37,Mh:37,ov:6,ovH:6,bd:22,g0:10,
+    win:{sb:107.6,sbV:151.6},door:{sb:149,sbV:193},
+    code:{frame:"7000-7002",sash:"7011-7018",dsash:"7013-7019",mullV:"7046-7047",mullH:"7046-7047",bead:"7043"}},
+  ak_s38t:{slide:1,hDed:71,I:0,wDed:0,gW:126.5,gH:127,bW:113.4,bH:152,cover:0,
+    code:{frame:"3580-3582",sash:"3585-3586",inter:"2703",bead:"3587"}},
+  ak_hs55t:{slide:1,hDed:78,I:16.8,wDed:0,gW:168,gH:164,bW:154,bH:198,cover:1,
+    code:{frame:"6002-6003",sash:"6010-6011",inter:"11524",cover:"4112",bead:"1699"}},
+  ak_fs50eco:{facade:1,tDed:4,fDed:-30}
+};
+function lkCal(){let ch=false;
+  ST().systems.forEach(s=>{const k=LKCAL[s.id];if(!k)return;
+    if(s.lkCalV===LKCAL_V&&s.lk)return;
+    s.lk=structuredClone(k);
+    if(k.grid)Object.assign(s,{F:k.F,M:k.Mv,ov:k.ov,ovH:k.ovH,ovBy:null,sDedW:k.win.sb+k.g0,sDedH:k.win.sbV-2*k.bd+k.g0,sDed:k.win.sb+k.g0,fDedW:k.g0,fDedH:k.g0,fDed:k.g0,sashW:null,beadJoint:null});
+    if(k.slide)Object.assign(s,{hDed:k.hDed,I:k.I,wDed:k.wDed,gW:k.gW,gH:k.gH});
+    if(k.facade)Object.assign(s,{fDedW:k.fDed,fDedH:k.fDed,fDed:k.fDed});
+    Object.assign(s,{cal:true,glassCal:true,calDate:"2026-11-17",calBy:"LogiKal — قوائم القص والزجاج الحقيقية"});
+    s.lkCalV=LKCAL_V;ch=true;});
+  if(ch)save();}
+const r1=x=>Math.round(x*10)/10;
+const lkKg=(s,code,type)=>{const L=LIB[s.id]||[],c0=code.split("-")[0];
+  const a=L.find(x=>x[0]===code)||L.find(x=>x[0].replace(/^\d+-/,"")===code)||L.find(x=>x[0].replace(/^\d+-/,"").split("-")[0]===c0);
+  return a?a[2]:(s.kg&&(s.kg[type]||s.kg.frame))||0;};
+const _geom0=geom;
+geom=function(p){const s=sys(p.sys),k=s&&s.lk;if(!k||p.type)return _geom0(p);
+  if(k.slide&&s.kind==="sliding"){const n=p.sashes,sw=(p.W-k.wDed+(n-1)*k.I)/n,sh=p.H-k.hDed;
+    const gw=Math.round(sw-k.gW),gh=Math.round(sh-k.gH);
+    return {s,kind:"sliding",n,sw,sh,gw,gh,fW:`فردة ${fmt(sw,1)} − ${k.gW}`,fH:`فردة ${fmt(sh,1)} − ${k.gH}`,
+      fS:`عرض الفردة = (${fmt(p.W)} + ${n-1}×${k.I}) ÷ ${n} = ${fmt(sw,1)} · ارتفاع الفردة = ${fmt(p.H)} − ${k.hDed} = ${fmt(sh,1)}`};}
+  if(!k.grid)return _geom0(p);
+  const W=p.W,H=p.H,F=k.F,cells=[];let x=0;
+  const allDoorBottom=k.door.noSill&&p.cols.every((_,ci)=>{const rs=p.rows[ci]||[H];return String(p.cells[ci+"-"+(rs.length-1)]||"").startsWith("door");});
+  p.cols.forEach((cw,ci)=>{const x0=x,x1=x+cw;x=x1;
+    const left=ci===0?F:k.Mv/2,right=ci===p.cols.length-1?F:k.Mv/2;let y=0;const rs=p.rows[ci]||[H];
+    rs.forEach((rh,ri)=>{const y0=y,y1=y+rh;y=y1;const last=ri===rs.length-1;
+      const fill=p.cells[ci+"-"+ri]||"fixed",door=fill.startsWith("door");
+      const top=ri===0?F:k.Mh/2,bot=last?(allDoorBottom?0:F):k.Mh/2;
+      const cx=x0+left,cy=y0+top,cw2=x1-right-cx,ch2=y1-bot-cy;
+      const c={ci,ri,fill,x0,y0,x1,y1,cx,cy,cw:cw2,ch:ch2};
+      if(fill!=="fixed"&&fill!=="panel"){const t=door?k.door:k.win,ns=door&&allDoorBottom&&last;
+        c.ffW=cw2;c.ffH=ch2;c.sw=r1(cw2+2*k.ov);c.sh=r1(ns?ch2+k.ovH-(t.gap||0):ch2+2*k.ovH);c.noSill=ns;c.t=t;
+        const dW=t.sb+k.g0,dH=t.sbV-2*k.bd+k.g0;
+        c.gw=Math.round(c.sw-dW);c.gh=Math.round(c.sh-dH);c.fW=`زت ${fmt(c.sw,1)} − ${dW}`;c.fH=`زت ${fmt(c.sh,1)} − ${r1(dH)}`;}
+      else if(fill==="fixed"){c.gw=Math.round(cw2-k.g0);c.gh=Math.round(ch2-k.g0);c.fW=`فتحة ${fmt(cw2,1)} − ${k.g0}`;c.fH=`فتحة ${fmt(ch2,1)} − ${k.g0}`;}
+      cells.push(c);});});
+  return {s,kind:s.kind,cells,lkNoSill:allDoorBottom};
+};
+const _bom0=bom;
+bom=function(p){const s=sys(p.sys),k=s&&s.lk,res=_bom0(p);if(!k||p.type)return res;
+  const g=res.g,q=p.qty,cut=[],glass=[],panels=[];
+  const addC=(name,len,ang,n,type,code)=>{const kgm=code?lkKg(s,code,type):((s.kg||{})[type]||0);
+    cut.push({name:code?`${name} · ${code}`:name,len:r1(len),ang,n:n*q,kgm,type,pk:s.id+":"+type,pcode:code||undefined});};
+  const addG=(w,h,n,label,fW="",fH="",key="all")=>{const id=infOf(p,key);if(INFILL[id])panels.push({w,h,n:n*q,label,kind:id,name:INFILL[id]});else glass.push({w,h,n:n*q,label,fW,fH,gid:id});};
+  if(k.facade){res.cut.forEach(c=>{if(/وسطية/.test(c.name)&&c.type==="frame"){c.len=r1(c.len-k.tDed);c.kg=c.len/1000*c.n*c.kgm;}});return res;}
+  if(k.slide&&g.kind==="sliding"){const C=k.code,n=g.n;
+    addC("جرجوب — أفقي",p.W,"45°",2,"frame",C.frame);addC("جرجوب — عمودي",p.H,"45°",2,"frame",C.frame);
+    addC("فردة — أفقي",g.sw,"45°",2*n,"sash",C.sash);addC("فردة — عمودي",g.sh,"45°",2*n,"sash",C.sash);
+    if(n>1){addC("كلاب (إنترلوك)",g.sh,"90°",2*(n-1),"inter",C.inter);if(k.cover)addC("غطاء الكلاب",g.sh,"90°",2*(n-1),"cap",C.cover);}
+    addC("ماسكة زجاج — أفقي",g.sw-k.bW,"90°",2*n,"bead",C.bead);addC("ماسكة زجاج — عمودي",g.sh-k.bH,"90°",2*n,"bead",C.bead);
+    addG(g.gw,g.gh,n,"فردة جرارة",g.fW,g.fH);
+    if(p.net){addC("منخل — أفقي",g.sw,"45°",2,"net");addC("منخل — عمودي",g.sh,"45°",2,"net");}
+  }else if(k.grid){const C=k.code,ns=g.lkNoSill;
+    addC("جرجوب — أفقي",p.W,"45°",ns?1:2,"frame",C.frame);addC("جرجوب — عمودي",p.H,"45°",2,"frame",C.frame);
+    p.cols.slice(0,-1).forEach(()=>addC("تي عمودي",p.H-(ns?k.F:2*k.F),"90°",1,"mull",C.mullV));
+    g.cells.forEach(c=>{if(c.ri<(p.rows[c.ci]||[]).length-1)addC("تي أفقي",c.cw,"90°",1,"mull",C.mullH);});
+    g.cells.forEach(c=>{const tag=`(${c.ci+1}-${c.ri+1})`;
+      if(c.fill==="panel"){addC("حشوة ألمنيوم "+tag,c.cw,"—",1,"panel");return;}
+      if(c.fill==="fixed"){addC("ماسكة زجاج — أفقي "+tag,c.cw,"90°",2,"bead",C.bead);addC("ماسكة زجاج — عمودي "+tag,c.ch-2*k.bd,"90°",2,"bead",C.bead);
+        addG(c.gw,c.gh,1,"ثابت "+tag,c.fW,c.fH,c.ci+"-"+c.ri);return;}
+      const door=c.fill.startsWith("door"),t=c.t,sc=door?(C.dsash||C.sash):C.sash;
+      addC((door?"زت باب":"زت")+" — أفقي "+tag,c.sw,"45°",c.noSill?1:2,"sash",sc);addC((door?"زت باب":"زت")+" — عمودي "+tag,c.sh,"45°",2,"sash",sc);
+      if(c.noSill)addC("عتبة باب سفلية "+tag,c.sw-t.bot,"90°",1,"sash",C.bot);
+      addC("ماسكة زجاج — أفقي "+tag,c.sw-t.sb,"90°",2,"bead",C.bead);addC("ماسكة زجاج — عمودي "+tag,c.sh-t.sbV,"90°",2,"bead",C.bead);
+      addG(c.gw,c.gh,1,(door?"باب ":"زت ")+tag,c.fW,c.fH,c.ci+"-"+c.ri);});
+  }else return res;
+  cut.forEach(c=>{c.kg=c.len/1000*c.n*c.kgm;});
+  return {...res,cut,glass,panels:panels.length?panels:res.panels};
+};
+lkCal();
+
+{const _mg=migrate;migrate=function(){_mg();try{lkCal()}catch(_){}}}
+
+</script>
+<script>
 /* ═══════════ مزامنة مشتركة بين الموظفين (Supabase: Lamsat) ═══════════ */
 const CLOUD={url:"https://nhybxwjbnjjdvmfbakxx.supabase.co",key:"sb_publishable_f_OI2OHYIJ-dsvKC3x_dog_MdNzZ65z",
   name:null,pin:null,role:null,since:null,hash:{},setHash:"",busy:false,ok:false,last:null,err:""};
