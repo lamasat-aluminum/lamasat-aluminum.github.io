@@ -423,7 +423,10 @@ function geom(p){
 function validate(p){
   const s=sys(p.sys),e=[];if(p.type)return e;
   if(p.W<300||p.H<300)e.push("القياس صغير جداً (أقل من 300مم).");
-  if(isGrid(s)){
+  if(isGrid(s)&&p.tr){const sh=p.cols.reduce((a,b)=>a+ +b,0);if(Math.abs(sh-p.H)>0.5)e.push(`مجموع ارتفاعات الصفوف ${fmt(sh)} ≠ الارتفاع ${fmt(p.H)}`);
+    p.rows.forEach((r,i)=>{const sw=r.reduce((a,b)=>a+ +b,0);if(Math.abs(sw-p.W)>0.5)e.push(`مجموع عروض الصف ${i+1} = ${fmt(sw)} ≠ العرض ${fmt(p.W)}`)});
+    geom(p).cells.forEach(c=>{if(c.gw!=null&&(c.gw<100||c.gh<100))e.push(`زجاج الخلية ${c.ci+1}-${c.ri+1} صغير جداً`);});}
+  else if(isGrid(s)){
     const sw=p.cols.reduce((a,b)=>a+ +b,0);if(Math.abs(sw-p.W)>0.5)e.push(`مجموع عروض الأعمدة ${fmt(sw)} ≠ العرض ${fmt(p.W)}`);
     p.rows.forEach((r,i)=>{const sh=r.reduce((a,b)=>a+ +b,0);if(Math.abs(sh-p.H)>0.5)e.push(`مجموع ارتفاعات العمود ${i+1} = ${fmt(sh)} ≠ الارتفاع ${fmt(p.H)}`)});
     const g=geom(p);g.cells.forEach(c=>{if(c.gw!=null&&(c.gw<100||c.gh<100))e.push(`زجاج الخلية ${c.ci+1}-${c.ri+1} صغير جداً — راجع الخصومات`);if(c.cw<150||c.ch<150)e.push(`الخلية ${c.ci+1}-${c.ri+1} صغيرة جداً`);if(c.fill!=="fixed"&&c.fill!=="panel"&&c.sw>1600&&!c.fill.startsWith("door"))e.push(`عرض الدرفة ${c.ci+1}-${c.ri+1} أكبر من 1600مم`)});
@@ -558,6 +561,9 @@ function drawPos(p,opt={}){
     if(dim){o+=dimH(0,W,H+40*DS,fmt(W));o+=dimV(0,H,-40*DS,fmt(H));
       for(let i=0;i<n;i++){const x=s.F-((n*sw-(n-1)*s.I)-(W-2*s.F))/2+i*(sw-s.I);o+=dimH(x,x+sw,-22*DS-(i%2)*24*DS,fmt(sw)+" درفة",0,1);}
     }
+  }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
+  }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
+  }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
   }else{
     o+=ring(0,0,W,H,s.F,fc);
     // قوائم وعوارض
@@ -736,14 +742,15 @@ function renderProps(){
   if(s.kind!=="shutter")h+=`<label style="display:flex;gap:6px;align-items:center;font-size:.82rem;margin-bottom:6px"><input type="checkbox" data-k="shutter" ${p.shutter?"checked":""}> صندوق أباجور فوگ القطعة</label>`;
   h+=errs.length?`<div class="bad" style="font-size:.8rem">⚠ ${errs.map(esc).join("<br>⚠ ")}</div>`:`<div class="ok" style="font-size:.8rem">✓ القياسات سليمة</div>`;
   h+=`</div>`;
-  if(isGrid(s)){
+  if(isGrid(s)&&p.tr&&typeof trEditor==="function"){h+=trEditor(p,s);}
+  else if(isGrid(s)){
     h+=`<div class="sec"><h3>التقسيم (أعمدة وصفوف)</h3>
      <div class="fld"><label>عروض الأعمدة مم (افصل بفاصلة)</label><input data-k="colsTxt" value="${p.cols.join(", ")}"></div>
-     <div class="chips" style="margin-bottom:8px"><button class="chip" data-split="c2" type="button">عمودين متساوية</button><button class="chip" data-split="c3" type="button">3 أعمدة</button><button class="chip" data-split="r2" type="button">+ عارضة فوگ الخلية</button><button class="chip" data-split="reset" type="button">بدون تقسيم</button></div>`;
+     <div class="chips" style="margin-bottom:8px"><button class="chip" data-split="c2" type="button">عمودين متساوية</button><button class="chip" data-split="c3" type="button">3 أعمدة</button><button class="chip" data-split="r2" type="button">+ عارضة فوگ الخلية</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="reset" type="button">بدون تقسيم</button></div>`;
     p.cols.forEach((_,ci)=>{h+=`<div class="fld"><label>ارتفاعات العمود ${ci+1} مم (من فوگ لجوه)</label><input data-rows="${ci}" value="${(p.rows[ci]||[p.H]).join(", ")}"></div>`;});
     h+=`<div class="hint">اضغط على الخلية حتى تختار نوعها:</div><div class="grid-ed" style="grid-template-columns:${p.cols.map(c=>c+"fr").join(" ")}">`;
     p.cols.forEach((_,ci)=>{h+=`<div style="display:grid;gap:4px;grid-template-rows:${(p.rows[ci]||[p.H]).map(r=>r+"fr").join(" ")}">`;(p.rows[ci]||[p.H]).forEach((_,ri)=>{const k=ci+"-"+ri;h+=`<button type="button" class="cellbtn ${k===selCell?"on":""}" data-cell="${k}">${FILLS[p.cells[k]||"fixed"]}</button>`;});h+=`</div>`;});
-    h+=`</div><div class="fld" style="margin-top:8px"><label>نوع الخلية المختارة (${selCell.split("-").map(n=>+n+1).join("-")})</label><select data-cellfill>${Object.entries(FILLS).filter(([k])=>s.kind==="door"||!k.startsWith("door")).map(([k,v])=>`<option value="${k}" ${(p.cells[selCell]||"fixed")===k?"selected":""}>${v}</option>`).join("")}</select></div></div>`;
+    h+=`</div><div class="fld" style="margin-top:8px"><label>نوع الخلية المختارة (${selCell.split("-").map(n=>+n+1).join("-")})</label><select data-cellfill>${Object.entries(FILLS).filter(([k])=>s.kind==="door"||(s.lk&&s.lk.door)||!k.startsWith("door")).map(([k,v])=>`<option value="${k}" ${(p.cells[selCell]||"fixed")===k?"selected":""}>${v}</option>`).join("")}</select></div></div>`;
   }
   h+=`<div class="sec"><h3>اللون — ${esc(col(p.color).n)} <span class="num" style="font-size:.72rem">${esc(col(p.color).code)}</span></h3><div class="swatches">${COLORS.map(c=>`<button type="button" title="${esc(c.n)} ${esc(c.code)}" data-color="${c.id}" aria-pressed="${c.id===p.color}" style="background:${c.hex}"></button>`).join("")}</div></div>
    ${s.kind==="shutter"?"":`<div class="sec"><h3>الزجاج</h3><div class="fld"><select data-k="glass">${opt(ST().glass,p.glass)}</select></div></div>`}
@@ -808,9 +815,9 @@ $("props").addEventListener("change",e=>{
   upd(()=>{
     if(k==="colsTxt"){const v=t.value.split(/[,،\s]+/).map(Number).filter(n=>n>0);if(v.length){p.cols=v;p.rows=v.map((_,i)=>p.rows[i]||[p.H]);}return;}
     if(k==="sys"){const old=sys(p.sys).kind;p.sys=t.value;["frameP","sashP","mullP","transP","interP","beadP","netP","slatP","boxP"].forEach(z=>delete p[z]);const nk=sys(p.sys).kind;if(isGrid(sys(p.sys))&&!p.cols.length){p.cols=[p.W];p.rows=[[p.H]];p.cells={"0-0":nk==="door"?"doorL":"casL"};}
-      if(nk!=="door")Object.keys(p.cells).forEach(c=>{if(p.cells[c].startsWith("door"))p.cells[c]="casL"});return;}
+      if(nk!=="door"&&!(sys(p.sys).lk&&sys(p.sys).lk.door))Object.keys(p.cells).forEach(c=>{if(p.cells[c].startsWith("door"))p.cells[c]="casL"});return;}
     if(k==="W"||k==="H"){const v=Math.max(1,+t.value||0),old=p[k];p[k]=v;
-      if(p.cols.length){if(k==="W"){const sc=v/old;p.cols=p.cols.map(c=>Math.round(c*sc));p.cols[p.cols.length-1]+=v-p.cols.reduce((a,b)=>a+b,0);}
+      if(p.cols.length){if(p.tr?k==="H":k==="W"){const sc=v/old;p.cols=p.cols.map(c=>Math.round(c*sc));p.cols[p.cols.length-1]+=v-p.cols.reduce((a,b)=>a+b,0);}
         else p.rows=p.rows.map(r=>{const sc=v/old,n=r.map(x=>Math.round(x*sc));n[n.length-1]+=v-n.reduce((a,b)=>a+b,0);return n;});}return;}
     if(k==="qty"&&p.type)p.qty=Math.max(0,+t.value||0);else if(k==="price")p.price=+t.value||0;else if(k==="qty"||k==="sashes")p[k]=Math.max(1,+t.value||1);
     else if(k==="net")p.net=t.value==="1";
@@ -1786,7 +1793,7 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=5;
+const LKCAL_V=6;
 const LKCAL={
   ak_wd37:{grid:1,F:36.5,M:45,mBy:{"713":24,"714":45},ov:5.8,bd:22,g0:10,
     win:{sb:82,sbV:126},door:{sb:146,sbV:215,noSill:1,gap:10,bot:146,code:"692"},doorO:{sb:146,sbV:190,code:"691"},
@@ -1807,9 +1814,9 @@ const LKCAL={
     code:{frame:"183",sframe:"181",sash:"181",mull:"182",L:"262",louver:"1034",wains:"115",bead:"104",gbead:"105"}},
   ak_s38t:{slide:1,hDed:71,I:0,wDed:0,gW:126.5,gH:127,bW:113.4,bH:152,cover:0,
     code:{frame:"3580-3582",sash:"3585-3586",inter:"2703",bead:"3587"}},
-  ak_hs55t:{slide:1,hDed:78,I:16.8,wDed:0,gW:168,gH:164,bW:154,bH:198,cover:1,
+  ak_hs55t:{slide:1,hDed:78,I:16.8,wDed:0,gW:168,gH:164,bW:154,bH:198,cover:1,n4:{add:111.8,code:"6014-6015",n:1},
     code:{frame:"6002-6003",sash:"6010-6011",inter:"11524",cover:"4112",bead:"1699"}},
-  ak_ts29:{slide:1,hDed:40,I:17,wDed:0,gW:92,gH:92,bW:84,bH:114,cover:0,beadT:[[4,"136"],[99,"138"]],
+  ak_ts29:{slide:1,hDed:40,I:17,wDed:0,gW:92,gH:92,bW:84,bH:114,cover:0,n4:{add:71.4,code:"137",n:2},beadT:[[4,"136"],[99,"138"]],
     code:{frame:"1242",sash:"132",inter:"135",bead:"138"}},
   ak_fs50eco:{facade:1,tDed:4,fDed:-30}
 };
@@ -1833,34 +1840,50 @@ const lkType=(k,fill)=>{if(fill.startsWith("doorO"))return k.doorO||k.door;if(fi
 const lkM=(p,s,k)=>{const pc=p.mullP,m=pc&&k.mBy&&k.mBy[String(pc).replace(/^\d+-/,"")];return m!=null?m:k.M;};
 const _geom0=geom;
 geom=function(p){const s=sys(p.sys),k=s&&s.lk;if(!k||p.type)return _geom0(p);
-  if(k.slide&&s.kind==="sliding"){const n=p.sashes,sw=(p.W-k.wDed+(n-1)*k.I)/n,sh=p.H-k.hDed;
+  if(k.slide&&s.kind==="sliding"){const n=p.sashes,add=n===4&&k.n4?k.n4.add:(n-1)*k.I,sw=r1((p.W-k.wDed+add)/n),sh=p.H-k.hDed;
     const gw=Math.round(sw-k.gW),gh=Math.round(sh-k.gH);
     return {s,kind:"sliding",n,sw,sh,gw,gh,fW:`فردة ${fmt(sw,1)} − ${k.gW}`,fH:`فردة ${fmt(sh,1)} − ${k.gH}`,
-      fS:`عرض الفردة = (${fmt(p.W)} + ${n-1}×${k.I}) ÷ ${n} = ${fmt(sw,1)} · ارتفاع الفردة = ${fmt(p.H)} − ${k.hDed} = ${fmt(sh,1)}`};}
-  if(!(k.grid||k.aldoks)||!isGrid(s))return _geom0(p);
-  const W=p.W,H=p.H,F=k.F,M=lkM(p,s,k),cells=[];let x=0;
-  const fillAt=(ci,ri)=>String(p.cells[ci+"-"+ri]||"fixed");
-  const lastFill=ci=>{const rs=p.rows[ci]||[H];return fillAt(ci,rs.length-1);};
-  const noSill=!!(k.door&&k.door.noSill)&&p.cols.every((_,ci)=>{const f=lastFill(ci);return f.startsWith("door")&&!f.startsWith("doorO");});
-  const meetR=ci=>!!(k.door&&k.door.meet!=null&&ci<p.cols.length-1&&(p.rows[ci]||[H]).length===1&&(p.rows[ci+1]||[H]).length===1&&fillAt(ci,0).startsWith("door")&&fillAt(ci+1,0).startsWith("door"));
-  p.cols.forEach((cw,ci)=>{const x0=x,x1=x+cw;x=x1;
-    const left=ci===0?F:(meetR(ci-1)?k.door.meet/2:M/2),right=ci===p.cols.length-1?F:(meetR(ci)?k.door.meet/2:M/2);let y=0;const rs=p.rows[ci]||[H];
-    rs.forEach((rh,ri)=>{const y0=y,y1=y+rh;y=y1;const last=ri===rs.length-1;
-      const fill=fillAt(ci,ri),door=fill.startsWith("door");
-      const top=ri===0?F:M/2,bot=last?(noSill?0:F):M/2;
+      fS:`عرض الفردة = (${fmt(p.W)} + ${fmt(add,1)}) ÷ ${n} = ${fmt(sw,1)} · ارتفاع الفردة = ${fmt(p.H)} − ${k.hDed} = ${fmt(sh,1)}`};}
+  if(!(k.grid||k.aldoks)||!isGrid(s))return p.tr&&isGrid(s)?trGeom0(p):_geom0(p);
+  const W=p.W,H=p.H,F=k.F,M=lkM(p,s,k),cells=[],tr=!!p.tr,mV=[],mH=[];
+  const fillAt=(b,i)=>String(p.cells[b+"-"+i]||"fixed"),items=b=>p.rows[b]||[tr?W:H],nb=p.cols.length;
+  const isIn=f=>f.startsWith("door")&&!f.startsWith("doorO");
+  const bottomCells=tr?items(nb-1).map((_,i)=>[nb-1,i]):p.cols.map((_,b)=>[b,items(b).length-1]);
+  const noSill=!!(k.door&&k.door.noSill)&&bottomCells.every(([b,i])=>isIn(fillAt(b,i)));
+  const hasMeet=!!(k.door&&k.door.meet!=null);
+  const meetBand=b=>hasMeet&&!tr&&b<nb-1&&items(b).length===1&&items(b+1).length===1&&fillAt(b,0).startsWith("door")&&fillAt(b+1,0).startsWith("door");
+  const meetItem=(b,i)=>hasMeet&&tr&&i<items(b).length-1&&fillAt(b,i).startsWith("door")&&fillAt(b,i+1).startsWith("door");
+  let a=0;
+  p.cols.forEach((bs,b)=>{const a0=a,a1=a+bs;a=a1;const lastB=b===nb-1,its=items(b);let t=0;
+    its.forEach((is,i)=>{const t0=t,t1=t+is;t=t1;const lastI=i===its.length-1;
+      const fill=fillAt(b,i),door=fill.startsWith("door");
+      let x0,x1,y0,y1,left,right,top,bot,isBottom;
+      if(!tr){x0=a0;x1=a1;y0=t0;y1=t1;left=b===0?F:(meetBand(b-1)?k.door.meet/2:M/2);right=lastB?F:(meetBand(b)?k.door.meet/2:M/2);top=i===0?F:M/2;isBottom=lastI;bot=lastI?(noSill?0:F):M/2;}
+      else{y0=a0;y1=a1;x0=t0;x1=t1;top=b===0?F:M/2;isBottom=lastB;bot=lastB?(noSill?0:F):M/2;left=i===0?F:(meetItem(b,i-1)?k.door.meet/2:M/2);right=lastI?F:(meetItem(b,i)?k.door.meet/2:M/2);}
       const cx=x0+left,cy=y0+top,cw2=x1-right-cx,ch2=y1-bot-cy;
-      const c={ci,ri,fill,x0,y0,x1,y1,cx,cy,cw:cw2,ch:ch2};
+      const c={ci:b,ri:i,fill,x0,y0,x1,y1,cx,cy,cw:cw2,ch:ch2};
+      if(!tr&&!lastI)mH.push(cw2);
+      if(tr&&!lastI&&!meetItem(b,i))mV.push(ch2);
       if(k.aldoks){if(fill!=="fixed"&&fill!=="panel"){c.sw=r1(cw2+2*k.ov);c.sh=r1(ch2+2*k.ov);c.fW=c.fH="";}cells.push(c);return;}
-      if(fill!=="fixed"&&fill!=="panel"){const t=lkType(k,fill),ns=door&&noSill&&last,ov=t.ov!=null?t.ov:k.ov;
-        c.ffW=cw2;c.ffH=ch2;c.sw=r1(cw2+2*ov);c.sh=r1(ns?ch2+ov-(t.gap||0):ch2+2*ov);c.noSill=ns;c.t=t;
-        const dW=t.sb+k.g0,dH=r1(t.sbV-2*k.bd+k.g0);
+      if(fill!=="fixed"&&fill!=="panel"){const tt=lkType(k,fill),ns=door&&noSill&&isBottom,ov=tt.ov!=null?tt.ov:k.ov;
+        c.ffW=cw2;c.ffH=ch2;c.sw=r1(cw2+2*ov);c.sh=r1(ns?ch2+ov-(tt.gap||0):ch2+2*ov);c.noSill=ns;c.t=tt;
+        const dW=tt.sb+k.g0,dH=r1(tt.sbV-2*k.bd+k.g0);
         c.gw=Math.round(c.sw-dW);c.gh=Math.round(c.sh-dH);c.fW=`زت ${fmt(c.sw,1)} − ${dW}`;c.fH=`زت ${fmt(c.sh,1)} − ${dH}`;}
       else if(fill==="fixed"){c.gw=Math.round(cw2-k.g0);c.gh=Math.round(ch2-k.g0);c.fW=`فتحة ${fmt(cw2,1)} − ${k.g0}`;c.fH=`فتحة ${fmt(ch2,1)} − ${k.g0}`;}
-      cells.push(c);});});
-  return {s,kind:s.kind,cells,lkNoSill:noSill,lkMeet:p.cols.map((_,ci)=>meetR(ci))};
+      cells.push(c);});
+    if(!lastB){if(!tr){if(!meetBand(b))mV.push(H-(noSill?F:2*F));}else mH.push(W-2*F);}
+  });
+  return {s,kind:s.kind,cells,lkNoSill:noSill,mV,mH,tr};
 };
+/* ترتيب "صفوف أولاً" للأنظمة غير المعايرة: نقلب المحاور */
+const trT=p=>({...p,tr:false,W:p.H,H:p.W});
+function trGeom0(p){const g=_geom0(trT(p));
+  g.cells=g.cells.map(c=>({...c,x0:c.y0,x1:c.y1,y0:c.x0,y1:c.x1,cx:c.cy,cy:c.cx,cw:c.ch,ch:c.cw,sw:c.sh,sh:c.sw,gw:c.gh,gh:c.gw,ffW:c.ffH,ffH:c.ffW,fW:c.fH,fH:c.fW}));g.tr=true;return g;}
 const _bom0=bom;
-bom=function(p){const s=sys(p.sys),k=s&&s.lk,res=_bom0(p);if(!k||p.type)return res;
+const swapN=n=>n.replace(/أفقي|عمودي/g,m=>m==="أفقي"?"عمودي":"أفقي");
+bom=function(p){const s=sys(p.sys),k=s&&s.lk;
+  if(p.tr&&!p.type&&isGrid(s)&&!(k&&(k.grid||k.aldoks))){const r=_bom0(trT(p));r.cut.forEach(c=>c.name=swapN(c.name));r.glass.forEach(x=>{[x.w,x.h]=[x.h,x.w];[x.fW,x.fH]=[x.fH,x.fW];});(r.panels||[]).forEach(x=>{[x.w,x.h]=[x.h,x.w];});r.g=geom(p);return r;}
+  const res=_bom0(p);if(!k||p.type)return res;
   const g=res.g,q=p.qty,cut=[],glass=[],panels=[];
   const addC=(name,len,ang,n,type,code)=>{if(n<=0)return;const kgm=code?lkKg(s,code,type):((s.kg||{})[type]||0);
     cut.push({name:code?`${name} · ${code}`:name,len:r1(len),ang,n:n*q,kgm,type,pk:s.id+":"+type,pcode:code||undefined});};
@@ -1870,14 +1893,14 @@ bom=function(p){const s=sys(p.sys),k=s&&s.lk,res=_bom0(p);if(!k||p.type)return r
   if(k.slide&&g.kind==="sliding"){const n=g.n;
     addC("جرجوب — أفقي",p.W,"45°",2,"frame",C.frame);addC("جرجوب — عمودي",p.H,"45°",2,"frame",C.frame);
     addC("فردة — أفقي",g.sw,"45°",2*n,"sash",C.sash);addC("فردة — عمودي",g.sh,"45°",2*n,"sash",C.sash);
-    if(n>1){addC("كلاب (إنترلوك)",g.sh,"90°",2*(n-1),"inter",C.inter);if(k.cover)addC("غطاء الكلاب",g.sh,"90°",2*(n-1),"cap",C.cover);}
+    if(n>1){const ni=n===4&&k.n4?4:2*(n-1);addC("كلاب (إنترلوك)",g.sh,"90°",ni,"inter",C.inter);if(k.cover)addC("غطاء الكلاب",g.sh,"90°",ni,"cap",C.cover);
+      if(n===4&&k.n4)addC("كلاب الوسط",g.sh,"90°",k.n4.n,"inter",k.n4.code);}
     addC("ماسكة زجاج — أفقي",g.sw-k.bW,"90°",2*n,"bead",C.bead);addC("ماسكة زجاج — عمودي",g.sh-k.bH,"90°",2*n,"bead",C.bead);
     addG(g.gw,g.gh,n,"فردة جرارة",g.fW,g.fH);
     if(p.net){addC("منخل — أفقي",g.sw,"45°",2,"net");addC("منخل — عمودي",g.sh,"45°",2,"net");}
   }else if(k.aldoks&&g.cells){const hasSash=g.cells.some(c=>c.fill!=="fixed"&&c.fill!=="panel"),fr=hasSash?C.sframe:C.frame,ex=hasSash?34:0;
     addC("جرجوب — أفقي",p.W+ex,"45°",2,"frame",fr);addC("جرجوب — عمودي",p.H+ex,"45°",2,"frame",fr);
-    p.cols.slice(0,-1).forEach(()=>addC("تي عمودي",p.H-2*k.F,"90°",1,"mull",C.mull));
-    g.cells.forEach(c=>{if(c.ri<(p.rows[c.ci]||[]).length-1)addC("تي أفقي",c.cw,"90°",1,"mull",C.mull);});
+    g.mV.forEach(L=>addC("تي عمودي",L,"90°",1,"mull",C.mull));g.mH.forEach(L=>addC("تي أفقي",L,"90°",1,"mull",C.mull));
     g.cells.forEach(c=>{const tag=`(${c.ci+1}-${c.ri+1})`,inf=infOf(p,c.ci+"-"+c.ri);
       if(c.fill!=="fixed"&&c.fill!=="panel"){const Lv=c.sh-119;
         addC("زت أباجور — أفقي "+tag,c.sw,"45°",2,"sash",C.sash);addC("زت أباجور — عمودي "+tag,c.sh,"45°",2,"sash",C.sash);
@@ -1892,8 +1915,7 @@ bom=function(p){const s=sys(p.sys),k=s&&s.lk,res=_bom0(p);if(!k||p.type)return r
       glass.push({w:Math.round(c.cw-10),h:Math.round(c.ch-10),n:q,label:"ثابت "+tag,fW:"",fH:"",gid:inf});});
   }else if(k.grid&&g.cells){const ns=g.lkNoSill,mc=p.mullP?String(p.mullP).replace(/^\d+-/,""):C.mull;
     addC("جرجوب — أفقي",p.W,"45°",ns?1:2,"frame",C.frame);addC("جرجوب — عمودي",p.H,"45°",2,"frame",C.frame);
-    p.cols.slice(0,-1).forEach((_,ci)=>{if(!(g.lkMeet&&g.lkMeet[ci]))addC("تي عمودي",p.H-(ns?k.F:2*k.F),"90°",1,"mull",mc);});
-    g.cells.forEach(c=>{if(c.ri<(p.rows[c.ci]||[]).length-1)addC("تي أفقي",c.cw,"90°",1,"mull",mc);});
+    g.mV.forEach(L=>addC("تي عمودي",L,"90°",1,"mull",mc));g.mH.forEach(L=>addC("تي أفقي",L,"90°",1,"mull",mc));
     let leaves=0;const bx=k.bx||1;
     g.cells.forEach(c=>{const tag=`(${c.ci+1}-${c.ri+1})`;
       if(c.fill==="panel"){addC("حشوة ألمنيوم "+tag,c.cw,"—",1,"panel");return;}
@@ -1913,6 +1935,58 @@ bom=function(p){const s=sys(p.sys),k=s&&s.lk,res=_bom0(p);if(!k||p.type)return r
 };
 lkCal();
 {const _mg=migrate;migrate=function(){_mg();try{lkCal()}catch(_){}}}
+
+/* ═══════════ ترتيب "صفوف أولاً": صف كامل فوگ (فوگ الباب/الشباك) وتحته أعمدة ═══════════
+   p.tr=true · p.cols = ارتفاعات الصفوف (من فوگ لجوه) · p.rows[i] = عروض خلايا الصف i (من اليسار) · المفتاح "صف-خلية" */
+function drawTrBody(p,g,s,fc,fc2,dim){let o=ring(0,0,p.W,p.H,s.F,fc);const W=p.W,H=p.H,F=s.F,M=s.M;
+  let y=0;p.cols.forEach((rh,ri)=>{y+=rh;if(ri<p.cols.length-1)o+=`<rect x="${F}" y="${y-M/2}" width="${W-2*F}" height="${M}" fill="${fc}" stroke="#1b1f23" stroke-width="1.2"/>`;});
+  g.cells.forEach(cl=>{const its=p.rows[cl.ci]||[];
+    if(cl.ri<its.length-1)o+=`<rect x="${cl.x1-M/2}" y="${cl.y0+(cl.ci===0?F:M/2)}" width="${M}" height="${cl.y1-cl.y0-(cl.ci===0?F:M/2)-(cl.ci===p.cols.length-1?F:M/2)}" fill="${fc}" stroke="#1b1f23" stroke-width="1.2"/>`;
+    const f=cl.fill,key=cl.ci+"-"+cl.ri;
+    if(f==="fixed"){o+=infR(infOf(p,key),cl.cx+6,cl.cy+6,cl.cw-12,cl.ch-12,1);return;}
+    if(f==="panel"){o+=`<rect x="${cl.cx+4}" y="${cl.cy+4}" width="${cl.cw-8}" height="${cl.ch-8}" fill="${fc2}" stroke="#1b1f23"/><rect x="${cl.cx+4}" y="${cl.cy+4}" width="${cl.cw-8}" height="${cl.ch-8}" fill="url(#hatch)"/>`;return;}
+    const S=s.S||60,sw=cl.sw||cl.cw,sh=cl.sh||cl.ch,sx=cl.cx-(sw-cl.cw)/2,sy=cl.cy-(cl.noSill?(sh-cl.ch)/2:(sh-cl.ch)/2),door=f.startsWith("door"),bt=door?(s.bottom||S):S;
+    o+=`<path d="M${sx} ${sy}h${sw}v${sh}h${-sw}z M${sx+S} ${sy+S}v${sh-S-bt}h${sw-2*S}v${-(sh-S-bt)}z" fill="${fc2}" fill-rule="evenodd" stroke="#1b1f23" stroke-width="1.4"/>`;
+    o+=infR(infOf(p,key),sx+S,sy+S,sw-2*S,sh-S-bt);
+    const hingeLeft=/L$/.test(f),gx1=sx+S,gx2=sx+sw-S,gy1=sy+S,gy2=sy+sh-bt,hx=hingeLeft?gx1:gx2,ox=hingeLeft?gx2:gx1;
+    if(f==="tiltT")o+=`<path d="M${gx1} ${gy1}L${(gx1+gx2)/2} ${gy2}L${gx2} ${gy1}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
+    else if(f==="tilt")o+=`<path d="M${gx1} ${gy2}L${(gx1+gx2)/2} ${gy1}L${gx2} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
+    else{o+=`<path d="M${ox} ${gy1}L${hx} ${(gy1+gy2)/2}L${ox} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
+      if(f.startsWith("tilt"))o+=`<path d="M${gx1} ${gy2}L${(gx1+gx2)/2} ${gy1}L${gx2} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
+      const hdx=hingeLeft?sx+sw-S/2:sx+S/2,hdy=door?sy+sh*.52:sy+sh/2;
+      o+=door?`<rect x="${hdx-6}" y="${hdy-160}" width="12" height="320" rx="6" fill="#b8bdc2" stroke="#666"/>`:`<rect x="${hdx-5}" y="${hdy-45}" width="10" height="90" rx="4" fill="#2b2f33"/>`;}
+  });
+  if(dim){o+=dimH(0,W,H+52*DS,fmt(W));o+=dimV(0,H,-40*DS,fmt(H));
+    if(p.cols.length>1){let y=0;p.cols.forEach(rh=>{o+=dimV(y,y+rh,W+26*DS,fmt(rh),1);y+=rh;});}
+    let y=0,k=0;p.cols.forEach((rh,ri)=>{const its=p.rows[ri]||[];if(its.length>1){let x=0;its.forEach(cw=>{o+=dimH(x,x+cw,(ri===p.cols.length-1?H+24*DS:y+rh/2),fmt(cw),0,1);x+=cw;});}y+=rh;});}
+  return o;}
+function trEditor(p,s){const dOK=s.kind==="door"||(s.lk&&s.lk.door);
+  let h=`<div class="sec"><h3>التقسيم (صفوف أولاً)</h3>
+   <div class="fld"><label>ارتفاعات الصفوف مم (من فوگ لجوه)</label><input data-trh value="${p.cols.join(", ")}"></div>`;
+  p.cols.forEach((_,ri)=>{h+=`<div class="fld"><label>عروض خلايا الصف ${ri+1} مم (من اليسار)</label><input data-trw="${ri}" value="${(p.rows[ri]||[p.W]).join(", ")}"></div>`;});
+  h+=`<div class="chips" style="margin-bottom:8px"><button class="chip" data-split="trc2" type="button">قسّم الصف المختار نصّين</button><button class="chip" data-split="untr" type="button">رجوع للترتيب العادي</button></div>
+   <div class="hint">اضغط على الخلية حتى تختار نوعها:</div><div style="display:grid;gap:4px;grid-template-rows:${p.cols.map(r=>r+"fr").join(" ")};min-height:180px">`;
+  p.cols.forEach((_,ri)=>{const its=p.rows[ri]||[p.W];h+=`<div style="display:grid;gap:4px;grid-template-columns:${its.map(c=>c+"fr").join(" ")}">`;
+    its.forEach((_,ci)=>{const k=ri+"-"+ci;h+=`<button type="button" class="cellbtn ${k===selCell?"on":""}" data-cell="${k}">${FILLS[p.cells[k]||"fixed"]}</button>`;});h+=`</div>`;});
+  h+=`</div><div class="fld" style="margin-top:8px"><label>نوع الخلية المختارة (${selCell.split("-").map(n=>+n+1).join("-")})</label><select data-cellfill>${Object.entries(FILLS).filter(([k])=>dOK||!k.startsWith("door")).map(([k,v])=>`<option value="${k}" ${(p.cells[selCell]||"fixed")===k?"selected":""}>${v}</option>`).join("")}</select></div></div>`;
+  return h;}
+const fitSum=(v,T)=>{v=v.map(x=>Math.max(1,Math.round(x)));v[v.length-1]+=T-v.reduce((a,b)=>a+b,0);return v;};
+$("props").addEventListener("change",e=>{const p=POS(),t=e.target;if(!p)return;
+  if(t.dataset.trh!==undefined){const v=t.value.split(/[,،\s]+/).map(Number).filter(n=>n>0);if(v.length){e.stopImmediatePropagation();upd(()=>{p.cols=v;p.rows=v.map((_,i)=>p.rows[i]||[p.W]);});}return;}
+  if(t.dataset.trw!==undefined){const v=t.value.split(/[,،\s]+/).map(Number).filter(n=>n>0);if(v.length){e.stopImmediatePropagation();upd(()=>p.rows[+t.dataset.trw]=v);}return;}
+  if(t.dataset.k==="sys"){const keep=structuredClone(p.cells),tr=p.tr;setTimeout(()=>{const q=POS(),ns=sys(q.sys);if(!isGrid(ns)){if(q.tr){q.tr=false;q.cols=[q.W];q.rows=[[q.H]];q.cells={"0-0":"casL"};save();renderProps();renderView();}return;}
+      if(ns.lk&&ns.lk.door){q.cells=keep;q.tr=tr;save();renderProps();renderView();}},0);}
+},true);
+$("props").addEventListener("click",e=>{const sp=e.target.closest("[data-split]");if(!sp)return;const k=sp.dataset.split,p=POS();
+  if(k==="fan"){e.stopImmediatePropagation();
+    if(!p.rows.every(r=>(r||[]).length<=1)){alertBar("الصف الكامل فوگ ينضاف إذا كل عمود بدون عوارض — شيل العوارض أول");return;}
+    upd(()=>{const top=Math.min(600,Math.round(p.H*.25)),oc=p.cols.slice(),cells={"0-0":"fixed"};oc.forEach((_,ci)=>cells["1-"+ci]=p.cells[ci+"-0"]||"fixed");
+      p.tr=true;p.cols=[top,p.H-top];p.rows=[[p.W],oc];p.cells=cells;selCell="1-0";});return;}
+  if(k==="untr"){e.stopImmediatePropagation();
+    upd(()=>{const last=p.cols.length-1,its=p.rows[last]||[p.W],cells={};its.forEach((_,i)=>cells[i+"-0"]=p.cells[last+"-"+i]||"fixed");p.tr=false;p.cols=its.slice();p.rows=its.map(()=>[p.H]);p.cells=cells;selCell="0-0";});return;}
+  if(k==="trc2"){e.stopImmediatePropagation();const [ri,ci]=selCell.split("-").map(Number),its=p.rows[ri];if(!its||!its[ci])return;
+    upd(()=>{const w=its[ci],a=Math.round(w/2);its.splice(ci,1,a,w-a);const nc={};Object.entries(p.cells).forEach(([kk,v])=>{const [r,c]=kk.split("-").map(Number);if(r===ri&&c>ci)nc[r+"-"+(c+1)]=v;else nc[kk]=v;});nc[ri+"-"+(ci+1)]=p.cells[selCell]||"fixed";p.cells=nc;});return;}
+},true);
 
 </script>
 <script>
