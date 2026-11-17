@@ -1469,10 +1469,11 @@ const IQCAT=[["frame","جرجوب (الفريم)"],["sash","زت (الفردة �
 const IQN=Object.fromEntries(IQCAT);
 function catOf(kind,c){const ty=c.type;if(ty==="frame")return kind==="facade"?"mull":"frame";if(ty==="sash")return kind==="sliding"?"slsash":/باب/.test(c.name)?"door":"sash";if(ty==="mull"||ty==="trans")return "mull";if(["inter","bead","net"].includes(ty))return ty;return "other";}
 const isThermal=s=>/\d+T\b|\d+T$|ED75|Sapphire|PD75|PVD/i.test(s.name);
+const LKCC={};
 function wzStock(list){ // list: [{p,b}]
   const cuts=[],glass={},pan={},acc={};
   list.forEach(({p,b},i)=>{const s=sys(p.sys),cl=col(p.color);
-    b.cut.forEach(c=>{if(c.type==="panel"||!c.kgm)return;const cat=catOf(s.kind,c);cuts.push({...c,color:cl.code,pk:s.id+":"+c.type+":"+(c.pcode||"")+":"+(c.pcode&&cat==="door"?"sash":cat)+"|"+cl.code,pos:i+1});});
+    b.cut.forEach(c=>{if(c.type==="panel"||!c.kgm)return;const cat=catOf(s.kind,c);cuts.push({...c,color:cl.code,pk:s.id+":"+(c.pcode?(LKCC[s.id+":"+c.pcode]||(LKCC[s.id+":"+c.pcode]=c.type+":"+c.pcode+":"+(cat==="door"?"sash":cat))):c.type+"::"+cat)+"|"+cl.code,pos:i+1});});
     b.glass.forEach(g=>{const k=g.gid||p.glass;const o=glass[k]||(glass[k]={n:0,m2:0});o.n+=g.n;o.m2+=g.w*g.h/1e6*g.n;});
     (b.panels||[]).forEach(g=>{const o=pan[g.kind]||(pan[g.kind]={n:0,m2:0});o.n+=g.n;o.m2+=g.w*g.h/1e6*g.n;});
     Object.entries(b.acc).forEach(([k,n])=>acc[k]=(acc[k]||0)+n);});
@@ -1699,7 +1700,7 @@ async function stockBody(list,title,addImg){const prj=P()||{},all=list.map(p=>({
   const LP=typeof LKPIC!=="undefined"?LKPIC:{},picC={};
   const pic=async code=>{const e=LP[code];if(!e||!e.i)return null;if(!(code in picC))picC[code]=await imgPng("data:image/jpeg;base64,"+e.i);return picC[code];};
   // أسماء القطع المضمّنة (مثل LogiKal) مع ضغط التسلسلات 001–365
-  const names=list.map(x=>{const i=(prj.positions||[]).indexOf(x);return String(x.name||"").trim()||pad3(i>=0?i+1:list.indexOf(x)+1);});
+  const names=list.map(x=>{const i=(prj.positions||[]).indexOf(x);const nm=String(x.name||"").trim();return nm&&!/[\u0600-\u06FF]/.test(nm)?nm:pad3(i>=0?i+1:list.indexOf(x)+1);});
   const posTxt=(()=>{const out=[];let i=0;while(i<names.length){let j=i;while(j+1<names.length&&/^\d+$/.test(names[j])&&/^\d+$/.test(names[j+1])&&+names[j+1]===+names[j]+1)j++;
       out.push(j-i>=2?names[i]+"–"+names[j]:names.slice(i,j+1).join(", "));i=j+1;}return out.join(", ");})();
   const T=(t,x={})=>wP(Array.isArray(t)?t:[{t:String(t??""),b:x.b}],{ltr:1,sz:x.sz||18,after:0,jc:x.jc});
