@@ -1455,7 +1455,7 @@ function wzHead(){return `<div class="wz-steps">${WZSTEPS.map((n,i)=>{const k=i+
 function wzFoot(){return `<div class="wz-foot"><button class="btn" type="button" data-wzgo="-1" ${WZ.step===1?"disabled":""}>→ السابق</button>
   <span class="hint">${WZ.p?esc(sys(WZ.p.sys).name)+" · "+fmt(WZ.p.W)+" × "+fmt(WZ.p.H):""}</span>
   ${WZ.step<7?`<button class="btn p" type="button" data-wzgo="1" ${!WZ.p?"disabled":""}>التالي ←</button>`:`<button class="btn p" type="button" id="wzAdd">✔ إضافة للمشروع</button>`}</div>`;}
-function wzGrid(mode){const p=WZ.p,s=sys(p.sys),opts=(s.lk&&s.lk.door&&s.kind!=="door")?[...(WZFILL[s.kind]||WZFILL.casement),"doorL","doorR"]:(WZFILL[s.kind]||WZFILL.casement),ins=[...ST().glass.map(g=>[g.id,g.n]),...Object.entries(INFILL)];
+function wzGrid(mode){const p=WZ.p,s=sys(p.sys);if(typeof LKCAL!=="undefined"&&LKCAL[s.id]&&LKCAL[s.id].door&&!(s.lk&&s.lk.door)){s.lkCalV=0;try{lkCal()}catch(_){}}const opts=(s.lk&&s.lk.door&&s.kind!=="door")?[...(WZFILL[s.kind]||WZFILL.casement),"doorL","doorR"]:(WZFILL[s.kind]||WZFILL.casement),ins=[...ST().glass.map(g=>[g.id,g.n]),...Object.entries(INFILL)];
   return `<div class="wz-grid" style="grid-template-columns:${p.cols.map(w=>w+"fr").join(" ")};grid-template-rows:${WZ.rh.map(h=>h+"fr").join(" ")};aspect-ratio:${p.W}/${p.H}">${
     WZ.rh.map((h,ri)=>p.cols.map((w,ci)=>{const k=ci+"-"+ri,f=p.cells[k]||"fixed";
       return `<div class="wz-cell f-${f}" style="grid-column:${ci+1};grid-row:${ri+1}"><small>${ci+1}-${ri+1} · ${fmt(w)}×${fmt(h)}</small>${mode==="open"
