@@ -769,6 +769,7 @@ function renderProps(){
   if(s.lk&&s.lk.slide&&s.lk.fixLite){h+=`<div class="fld"><label>نوع القطعة</label><select data-k="fixLite"><option value="0" ${!p.fixLite?"selected":""}>جرار (فردات)</option><option value="1" ${p.fixLite?"selected":""}>ثابت جانبي — إطار ${s.lk.fixLite.code}</option></select></div>`+(p.fixLite?`<div class="fld"><label>تقسيم الارتفاع (من فوق لتحت)</label><input data-k="flRows" value="${esc(p.flRows||p.H)}" placeholder="800,1948"></div>`:"");}
   if(s.lk&&s.lk.door&&s.lk.door.noSill&&s.lk.doorS&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door"))){h+=`<div class="fld"><label>عتبة الباب</label><select data-k="withSill"><option value="0" ${!p.withSill?"selected":""}>بدون عتبة — زت سفلي ${esc(s.lk.code.bot||"")}</option><option value="1" ${p.withSill?"selected":""}>مع جرجوب سفلي (عتبة)</option></select></div>`;}
   if(s.lk&&s.lk.door&&s.lk.door.alts&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door"))){const L=[s.lk.door.code,...s.lk.door.alts],v=String(p.doorP||s.lk.door.code);h+=`<div class="fld"><label>مقطع زت الباب</label><select data-k="doorP">${L.map(c=>`<option value="${c}" ${c===v?"selected":""}>${c}</option>`).join("")}</select></div>`;}
+  if(s.lk&&s.lk.beadT){const L=[...new Set(s.lk.beadT.map(x=>x[1]))],v=String(p.beadP||"");h+=`<div class="fld"><label>ماسكة الزجاج</label><select data-k="beadP"><option value="" ${!v?"selected":""}>تلقائي حسب سمك الزجاج</option>${L.map(c=>`<option value="${c}" ${c===v?"selected":""}>${c}</option>`).join("")}</select></div>`;}
   if(s.lk&&s.lk.cap){const k=s.lk,mc=p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull;h+=`<div class="fld"><label>مقطع القائم/العارضة</label><select data-k="mullP">${k.mulls.map(c=>`<option value="${c}" ${c===mc?"selected":""}>${c}</option>`).join("")}</select></div><div class="fld"><label>طريقة التجميع</label><select data-k="capV"><option value="0" ${!p.capV?"selected":""}>المحيط الأفقي كامل (القوائم بين المحيط)</option><option value="1" ${p.capV?"selected":""}>القوائم مستمرة — المحيط الأفقي مقطّع بين القوائم</option></select></div><div class="hint">✔ معاير على LogiKal: غطاء ${k.code.fcover} + قائم ${mc} + شريحة ضغط ${k.code.press} · الزجاج = الفتحة + ${k.gAdd}</div>`;}
   if(s.lk&&((s.lk.doorNS&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door")))||(s.lk.fixNS&&!p.arch))){h+=`<div class="fld"><label>عتبة الباب</label><select data-k="noSill"><option value="0" ${!p.noSill?"selected":""}>مع جرجوب سفلي (عتبة)</option><option value="1" ${p.noSill?"selected":""}>بدون عتبة — زت سفلي ${esc((s.lk.code&&s.lk.code.bot)||"")}</option></select></div>`;}
   if(s.lk&&s.lk.code&&typeof lkProfHtml==="function"){h+=`<details open><summary style="cursor:pointer;font-size:.82rem;color:#2b5797;margin:4px 0 6px">مقاطع LogiKal المعتمدة</summary>${lkProfHtml(s)}</details>`;}else if(s.kind!=="facade"&&LIB[s.id]){const L=LIB[s.id],RL={frame:"الإطار",sash:"الدرفة",mull:"القائم/العارضة",inter:"الإنترلوك",bead:"خرزة الزجاج",net:"المنخل",slat:"الشريحة",box:"الصندوق"};
@@ -1869,24 +1870,49 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=16;
+const LKCAL_V=17;
 const LKCAL={
-  ak_wd37:{grid:1,F:36.5,M:45,frameAlt:{"709":{code:{frame:"709",bead:"771"}}},mBy:{"713":24,"714":45},ov:5.8,bd:22,g0:10,
+  ak_wd37:{acc2:[
+      ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:19}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:19.1}],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
+      ["AKS1277","EPDM Conta KBF.70","door","spd",2.06,0,{mx:4}],["AKS1319","Epdm Conta OBF 06","door","spd",1.03,0,{mx:-9}],
+      ["AKS1277","EPDM Conta KBF.70","win","sp",2.06,0],["AKS1319","Epdm Conta OBF 06","win","sp",1.03,47.5],["AKS785","Fuji 2000 Zamak Baglanti","win",4],["AKS787","MO20 Pls Kose","win",4],["KT386-26,7","KT386-26,7mm","win",4,{minSh:400,bh:1,alt:["AKS780","26mm Zamak Kose Baglanti"]}],
+      ["AKS706","MO.97 Kapak","meet",2],
+      ["AKS2337","4,2X19 mm YSB Sac Vida","doorNS",4],["AKS2356","5,5*50 Sac Vidasi / Y.S.B.","doorNS",8],["AKS793","L Ortakayit Baglantisi","doorNS",4],["AKS824","Aluminyum Kapi Alti Fircasi","doorNS",1],
+      ["AKS785","Fuji 2000 Zamak Baglanti","dcorner",1],["KT597-290","KT597-290mm","dcorner",1],
+      ["AKS780","26mm Zamak Kose Baglanti","fcorner",1],["AKS785","Fuji 2000 Zamak Baglanti","fcorner",1],
+      ["AKS2337","4,2X19 mm YSB Sac Vida","mull",4],["AKS2356","5,5*50 Sac Vidasi / Y.S.B.","mull",8,{byMull:{"713":4}}],["AKS793","L Ortakayit Baglantisi","mull",4]],
+    grid:1,F:36.5,M:45,frameAlt:{"709":{code:{frame:"709",bead:"771"}}},mBy:{"713":24,"714":45},ov:5.8,bd:22,g0:10,
     win:{sb:82,sbV:126},door:{sb:146,sbV:215,noSill:1,gap:10,bot:146,code:"692",meet:17,meetCode:"760"},doorS:{sbV:190},doorO:{sb:146,sbV:190,code:"691"},rod:1,rodDed:200,rodRe:/^tilt[LR]/,
     code:{frame:"708",sash:"710",mull:"714",bead:"770",bot:"715",rod:"8241"}},
-  ak_wd50t:{grid:1,F:36,M:36,ov:6,bd:22,g0:10,
+  ak_wd50t:{acc2:[
+      ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMin:21}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMax:20.9}],
+      ["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
+      ["AKS1277","EPDM Conta KBF.70","win","sp",2.06,0],["AKS1322","Epdm Conta OBF 20","win","sp",1.03,48],["KT 387 096","Corner Cleat","win",4],["KT 598 262","Corner Cleat","win",4],
+      ["AKS1277","EPDM Conta KBF.70","door","spd",2.06,0],["AKS1322","Epdm Conta OBF 20","door","spd",1.03,3],["KT 1664 094","Corner Cleat","door",4],["KT597-260","KT597-260mm","door",4],
+      ["AKS779","19mm Zamak Kose Baglanti 0423","fcorner",1],["AKS2337","4,2X19 mm YSB Sac Vida","mull",4],["AKS2356","5,5*50 Sac Vidasi / Y.S.B.","mull",4],["AKS793","L Ortakayit Baglantisi","mull",4]],
+    grid:1,F:36,M:36,ov:6,bd:22,g0:10,
     win:{sb:86,sbV:130},door:{sb:148,sbV:192,code:"651-652"},tilt:{sb:106,sbV:150,code:"649-650"},rod:1,rodDed:200,
     code:{frame:"643-644",sash:"647-648",mull:"657-658",bead:"664",rod:"8241"}},
-  ak_wd70t:{grid:1,F:40,M:37,ov:6,bd:22,g0:10,
+  ak_wd70t:{acc2:[
+      ["AKS1259","EPDM Conta DCF73","glz","bp",1.03,88],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:23}],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:22.9}],
+      ["AKS1277","EPDM Conta KBF.70","win","sp",2.06,0],["AKS1331","Epdm Conta OBF.70","cas","sp",1.03,48],["AKS1331","Epdm Conta OBF.70","tilt","sp",1.03,40],
+      ["AKS1277","EPDM Conta KBF.70","door","spd",2.06,1.5],["AKS1331","Epdm Conta OBF.70","door","spd",1.03,-3],
+      ["7060-185","Perpendicular Connection","mull",2],["7060-219","Perpendicular Connection","mull",2],
+      ["AKS785","Fuji 2000 Zamak Baglanti","fcorner",1],["AKS789","MO 19 Ince Kose","fcorner",1],["KT 598 195","Corner Cleat","fcorner",2,{minH:1000,alt:["AKS779","19mm Zamak Kose Baglanti 0423"]}],
+      ["75 130354","KT 3088-120 Corner Cleat","cas",4],["AKS785","Fuji 2000 Zamak Baglanti","win",4],["AKS789","MO 19 Ince Kose","win",4],["KT 1662 270","Corner Cleat","cas",4],
+      ["KT 413 120","Corner Cleat","tilt",4],["KT 5022 265","Corner Cleat","tilt",4],["AKS4469","R29W Rotoline Eksenel Kol","tilt",1],["AKS73","Oval Seri Pencere Mentese","tilt",2],["AKS739","Isi Yalitimli Ispanyolet Pimi","tilt",2],["AKS742","Ayarli Ispanyolet Karsiligi (Vidali)","tilt",2],
+      ["75 130202","KT 3698-120 Corner Cleat","dcorner",1],["75 130378","KT 7040-270 Corner Cleat","dcorner",1],["AKS785","Fuji 2000 Zamak Baglanti","dcorner",1],["AKS789","MO 19 Ince Kose","dcorner",1],
+      ["AKS824","Aluminyum Kapi Alti Fircasi","doorNS",1]],
+    grid:1,F:40,M:37,ov:6,bd:22,g0:10,
     win:{sb:107.6,sbV:151.6},tilt:{ov:5,sb:88,sbV:132,code:"7008-7009"},door:{sb:149,sbV:193,code:"7013-7019",alts:["7015-7020"]},rod:1,rodDed:150,rodRe:/^tilt[LR]/,doorNS:{gap:10,bot:149,sbV:226.5},
     beadT:[[12,"676"],[99,"7043"]],code:{frame:"7000-7002",sash:"7011-7018",mull:"7046-7047",bead:"7043",bot:"7028-7030",rod:"8241"}},
   ak_wd55:{grid:1,F:42,M:42,mBy:{"1694":42,"1783":42},ov:5,bd:22,g0:10,rod:1,
     win:{sb:91,sbV:135},door:{sb:176,sbV:220,code:"1660"},
     code:{frame:"1686",sash:"1691",mull:"1694",bead:"1745",rod:"8241"}},
-  ak_wd60:{grid:1,F:49,M:49,ov:-21.35,bd:17,g0:10,leaf:1,bx:2,fixNS:{h:133},arch:{sb:1.03},
+  ak_wd60:{acc2:[["AKS1446","Kama Fitili (2mm)","fix","bp",2.06,68,{tMin:21,tMax:22.9,arch:[2.06,34]}],["AKS1447","Epdm Lastik Contasi 2300","fix","bp",2.06,68,{tMax:20.9,arch:[2.06,34]}],["AKS1446","Kama Fitili (2mm)","fix","bp",0,0,{tMin:23,archOnly:1,arch:[1.03,34]}]],grid:1,F:49,M:49,ov:-21.35,bd:17,g0:10,leaf:1,bx:2,fixNS:{h:133},arch:{sb:1.03},
     win:{sb:98,sbV:216,est:1},door:{sb:98,sbV:216,noSill:1,gap:20.25,bot:98,meet:-22.2,code:"452"},
     code:{frame:"452",sash:"452",mull:"452",bead:"455",bot:"456",ad1:"704",ad2:"700"}},
-  ak_aldoks:{aldoks:1,F:42.5,M:42.4,tiltOv:9,tiltRod:{ded:200,codes:["639","640"]},mBy:{"182":42.4,"109":42.4,"179":25},mFull:{"109":1},slimF:{F:25,clF:42.8,code:{frame:"180",sash:"178",cleat:"152"},door:{sb:84,top:42}},ov:7,pitchL:55,pitchW:79,addW:100,
+  ak_aldoks:{acc2:[["AKS2257","3,9*16 YSB M.U.V","pos",16],["AKS2257","3,9*16 YSB M.U.V","sash",16],["AKS824","Aluminyum Kapi Alti Fircasi","doorNS",1],["AKS1435","Hortumlu Cam Fitili (3 mm)","glzA","gp",1.03,96],["01 120101","Espagnolette Pin Short","tiltLR",2]],aldoks:1,F:42.5,M:42.4,tiltOv:9,tiltRod:{ded:200,codes:["639","640"]},mBy:{"182":42.4,"109":42.4,"179":25},mFull:{"109":1},slimF:{F:25,clF:42.8,code:{frame:"180",sash:"178",cleat:"152"},door:{sb:84,top:42}},ov:7,pitchL:55,pitchW:79,addW:100,
     door:{ov:7,gap:10,top:59.5,rail:103,sb:119,cw:59.5},clF:42.6,clS:43.1,accFix:{AKS1429:"casement",AKS1430:"casement",AKS219:"casement"},
     acc:[["AKS2257","3,9*16 YSB M.U.V","sash",16,"door",1000],["AKS824","Aluminyum Kapi Alti Fircasi","sash",1,"door",100],["AKS1435","Hortumlu Cam Fitili (3 mm)","glassM",1,"all",100]],
     code:{frame:"183",sframe:"181",sash:"181",mull:"182",L:"262",louver:"1034",wains:"115",bead:"104",gbead:"105",bot:"184",cleat:"151",conn:"225"}},
@@ -1894,10 +1920,12 @@ const LKCAL={
     code:{frame:"3580-3582",sash:"3585-3586",inter:"2703",bead:"3587"}},
   ak_hs55t:{slide:1,fixLite:{code:"1718-8007",bead:"1699",bE:64,bM:43,gE:47,gM:26,gW:14},hDed:78,I:16.8,wDed:0,gW:168,gH:164,bW:154,bH:198,cover:1,n4:{add:111.8,code:"6014-6015",n:1},
     code:{frame:"6002-6003",sash:"6010-6011",inter:"11524",cover:"4112",bead:"1699"}},
-  ak_ts29:{slide:1,hDed:40,I:17,wDed:0,gW:92,gH:92,bW:84,bH:114,cover:0,n4:{add:71.4,code:"137",n:2},beadT:[[4,"136"],[99,"138"]],
+  ak_ts29:{acc2:[["AKS1447","Epdm Lastik Contasi 2300","sl","gpx",2.06,148],["AKS1535","Firca Fitil (FC.707)","slLin",1.03,{2:[4,6,172],4:[4,8,39]}]],slide:1,hDed:40,I:17,wDed:0,gW:92,gH:92,bW:84,bH:114,cover:0,n4:{add:71.4,code:"137",n:2},beadT:[[4,"136"],[99,"138"]],
     code:{frame:"1242",sash:"132",inter:"135",bead:"138"}},
   ak_fs50eco:{facade:1,tDed:4,fDed:-30},
-  ak_fs50k:{cap:1,F:50,M:50,gAdd:30,mDed:4,mulls:["5006","5008"],code:{fcover:"2006",mull:"5006",press:"5048"}}
+  ak_fs50k:{acc2:[["AKS681","Cam Destek Takozu 50mm CT 33","field",2],
+      ["AKS1243","Cephe Cam Fitili (24mm)","field","gp",1.03,120,{tMax:24}],["AKS1244","Cephe Cam Fitili (9mm)","field","gp",1.03,120,{tMin:25,tMax:28}],["AKS1237","FS50ECO-CF.03","field","gp",1.03,120,{tMin:29}]],
+    cap:1,F:50,M:50,gAdd:30,mDed:4,mulls:["5006","5008"],code:{fcover:"2006",mull:"5006",press:"5048"}}
 };
 if(typeof FILLS==="object"&&!FILLS.doorOL){FILLS.doorOL="باب للخارج يسار";FILLS.doorOR="باب للخارج يمين";}
 function lkCal(){let ch=false;
@@ -1964,7 +1992,7 @@ geom=function(p){const s=sys(p.sys),k=lkK(p,s);if(!k||p.type)return _geom0(p);
         if(door){c.door=1;c.noSill=ns;c.sw=r1(cw2+2*D.ov);c.sh=r1(ns?ch2+D.ov-D.gap:ch2+2*D.ov);c.iw=r1(c.sw-D.sb);c.ih=r1(c.sh-D.top-(ns?D.rail:D.top));
           c.gw=Math.round(c.iw-10);c.gh=Math.round(c.ih-10);c.fW=`زت ${fmt(c.sw,1)} − ${D.sb+10}`;c.fH=`زت ${fmt(c.sh,1)} − ${r1(c.sh-c.gh)}`;}
         else if(fill==="fixed"){c.rail=ns;c.iw=cw2;c.ih=r1(ch2-(ns?D.rail:0));c.gw=Math.round(c.iw-10);c.gh=Math.round(c.ih-10);c.fW=`فتحة ${fmt(cw2,1)} − 10`;c.fH=`فتحة ${fmt(c.ih,1)} − 10`;}
-        else if(fill!=="panel"){const ovL=/^tilt/.test(fill)&&k.tiltOv!=null?k.tiltOv:k.ov;c.sw=r1(cw2+2*ovL);c.sh=r1(ch2+2*ovL);c.fW=c.fH="";
+        else if(fill!=="panel"){const key0=b+"-"+i,inf0=infOf(p,key0),expl0=p.infill&&p.infill[key0]!=null,lv0=INFILL[inf0]||(!expl0&&/أباجور|شباج|louver/i.test(p.name||"")),ovL=/^tilt[LR]/.test(fill)&&lv0&&k.tiltOv!=null?k.tiltOv:k.ov;c.sw=r1(cw2+2*ovL);c.sh=r1(ch2+2*ovL);c.fW=c.fH="";
           const key=b+"-"+i,inf=infOf(p,key),expl=p.infill&&p.infill[key]!=null;
           if(!INFILL[inf]&&!(!expl&&/أباجور|شباج|louver/i.test(p.name||""))){c.gz=1;c.iw=r1(c.sw-D.sb);c.ih=r1(c.sh-2*D.top);c.gw=Math.round(c.iw-10);c.gh=Math.round(c.ih-10);
             c.fW=`زت ${fmt(c.sw,1)} − ${D.sb+10}`;c.fH=`زت ${fmt(c.sh,1)} − ${D.sb+10}`;}}
@@ -1977,7 +2005,7 @@ geom=function(p){const s=sys(p.sys),k=lkK(p,s);if(!k||p.type)return _geom0(p);
       cells.push(c);});
     if(!lastB){if(!tr){if(!meetBand(b))mV.push(H-(noSill?F+nsB:2*F));}else mH.push(W-2*F);}
   });
-  const meets=[];if(hasMeet&&k.door.meetCode)p.cols.forEach((_,b)=>{if(meetBand(b)){const c=cells.find(x=>x.ci===b&&x.ri===0);if(c&&c.sh)meets.push(c.sh);}});
+  const meets=[];if(hasMeet&&k.door.meetCode)p.cols.forEach((_,b)=>{if(meetBand(b)){const c=cells.find(x=>x.ci===b&&x.ri===0);if(c&&c.sh){meets.push(c.sh);c.meetL=1;}}});
   return {s,kind:s.kind,cells,lkNoSill:noSill,lkFixNS:fns,mV,mH,tr,meets};
 };
 /* ترتيب "صفوف أولاً" للأنظمة غير المعايرة: نقلب المحاور */
@@ -2003,9 +2031,9 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
       rs.forEach((r,i)=>{const ch=r-(i===0?F:M/2)-(i===rs.length-1?F:M/2);
         addG(Math.round(cw+k.gAdd),Math.round(ch+k.gAdd),1,`حقل ${b+1}-${i+1}`,`فتحة ${fmt(cw,1)} + ${k.gAdd}`,`فتحة ${fmt(ch,1)} + ${k.gAdd}`,b+"-"+i);});});
     cut.forEach(c=>{c.kg=c.len/1000*c.n*c.kgm;});
-    return {...res,cut,glass,panels};}
+    {const out={...res,cut,glass,panels};lkAccApply(p,out,s,k,null);return out;}}
   if(k.facade){res.cut.forEach(c=>{if(/وسطية/.test(c.name)&&c.type==="frame"){c.len=r1(c.len-k.tDed);c.kg=c.len/1000*c.n*c.kgm;}});return res;}
-  const C={...k.code};if(k.beadT){const th=(gls(p.glass)||{}).t||6,r=k.beadT.find(x=>th<=x[0]);if(r)C.bead=r[1];}
+  const C={...k.code};if(k.beadT){const th=(gls(p.glass)||{}).t||6,r=k.beadT.find(x=>th<=x[0]);if(r)C.bead=r[1];if(p.beadP&&k.beadT.some(x=>x[1]===String(p.beadP)))C.bead=String(p.beadP);}
   if(k.slide&&g.lkFixLite){const z=k.fixLite,rs=g.lkFixLite;
     addC("إطار ثابت (تي مقوّى) — أفقي",p.W,"90°",2,"frame",z.code);addC("إطار ثابت (تي مقوّى) — عمودي",p.H,"90°",2,"frame",z.code);
     if(rs.length>1)addC("تي أفقي (مقوّى)",p.W,"90°",rs.length-1,"mull",z.code);
@@ -2042,7 +2070,7 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
         addC("زت أباجور — أفقي "+tag,c.sw,"45°",2,"sash",C.sash);addC("زت أباجور — عمودي "+tag,c.sh,"45°",2,"sash",C.sash);
         addC("زاوية L — أفقي "+tag,c.sw-159,"90°",2,"other",C.L);addC("زاوية L — عمودي "+tag,Lv,"90°",2,"other",C.L);
         addC("شفرة لوفر "+tag,c.sw-122,"90°",Math.ceil(Lv/k.pitchL),"sash",C.louver);
-        if(/^tilt/.test(c.fill)&&k.tiltRod){addC("قضيب "+tag,r1(c.sh-k.tiltRod.ded),"90°",1,"other",k.tiltRod.codes[0]);addC("قضيب "+tag,r1(c.sh-k.tiltRod.ded),"90°",1,"other",k.tiltRod.codes[1]);}
+        if(/^tilt[LR]/.test(c.fill)&&k.tiltRod){addC("قضيب "+tag,r1(c.sh-k.tiltRod.ded),"90°",1,"other",k.tiltRod.codes[0]);addC("قضيب "+tag,r1(c.sh-k.tiltRod.ded),"90°",1,"other",k.tiltRod.codes[1]);}
         panels.push({w:Math.round(c.sw),h:Math.round(c.sh),n:q,label:"زت أباجور "+tag,kind:"louver",name:INFILL.louver});return;}
       if(inf==="louver"){const Lv=c.ch;addC("زاوية L — أفقي "+tag,c.cw-40,"90°",2,"other",C.L);addC("زاوية L — عمودي "+tag,Lv,"90°",2,"other",C.L);
         addC("شفرة لوفر "+tag,c.cw-3,"90°",Math.ceil(Lv/k.pitchL),"sash",C.louver);panels.push({w:Math.round(c.cw),h:Math.round(c.ch),n:q,label:"لوفر "+tag,kind:"louver",name:INFILL.louver});return;}
@@ -2085,11 +2113,12 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
     if(k.leaf&&leaves){addC("أدابتور 704 — أفقي",p.W-90.4,"45°",1,"other",C.ad1);addC("أدابتور 704 — عمودي",p.H-45.2,"45°",2,"other",C.ad1);}
   }else return res;
   cut.forEach(c=>{c.kg=c.len/1000*c.n*c.kgm;});
-  return {...res,cut,glass,panels:panels.length?panels:(k.aldoks?[]:res.panels)};
+  const out={...res,cut,glass,panels:panels.length?panels:(k.aldoks?[]:res.panels)};lkAccApply(p,out,s,k,null);return out;
 };
 try{if(!ST().systems.find(x=>x.id==="ak_fs50k")){const b0=ST().systems.find(x=>x.id==="fs50")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50k",name:"Akpa FS50 كبكلي (غطاء ضغط) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:1.4,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 lkCal();
-try{const G=ST().glass;if(!G.find(g=>g.id==="s4"))G.push({id:"s4",ug:5.9,n:"مفرد شفاف 4مم",t:4,price:15000,layers:[4]});}catch(_){}
+try{const G=ST().glass;if(!G.find(g=>g.id==="s4"))G.push({id:"s4",ug:5.9,n:"مفرد شفاف 4مم",t:4,price:15000,layers:[4]});
+  [["d686","دبل 6/8/6 = 20مم",20,[6,8,6]],["d6106","دبل 6/10/6 = 22مم",22,[6,10,6]],["d6126","دبل 6/12/6 = 24مم",24,[6,12,6]]].forEach(([id,n,t,L])=>{if(!G.find(g=>g.id===id))G.push({id,ug:2.8,n,t,price:(G.find(g=>g.id==="d4164")||{}).price||48000,layers:L});});}catch(_){}
 {const _mg=migrate;migrate=function(){_mg();try{lkCal()}catch(_){}}}
 const LKROLE={fcover:"غطاء خارجي (كاب)",press:"شريحة ضغط",frame:"جرجوب (الفريم)",sframe:"جرجوب مع أباجور",sash:"زت (الفردة)",mull:"تي (القاطع)",inter:"إنترلوك",cover:"غطاء إنترلوك",bead:"ماسكة الزجاج",gbead:"ماسكة زجاج مفرد",bot:"عتبة / زت سفلي",L:"زاوية L",louver:"شفرة لوفر",wains:"لامبري",rod:"قضيب القلاب",ad1:"أدابتر فردة 1",ad2:"أدابتر فردة 2",cleat:"كورنر تجميع",conn:"وصلة تي"};
 function lkProfList(s){const k=LKCAL[s.id];if(!k||!k.code)return [];const R=[],LP=typeof LKPIC!=="undefined"?LKPIC:{};
@@ -2108,6 +2137,53 @@ function archBody(p,g,s,fc,dim){const W=p.W,H=p.H,F=s.lk.F,{R:R0,leg}=g.lkArch,r
 function flBody(p,g,s,fc,dim){const W=p.W,H=p.H,t=40;let o=`<rect x="0" y="0" width="${W}" height="${H}" fill="${fc}" stroke="#1b1f23" stroke-width="1.4"/>`;let y=0;
   g.lkFixLite.forEach((r,i)=>{const y0=y+(i===0?t:t/2),y1=y+r-(i===g.lkFixLite.length-1?t:t/2);o+=`<rect x="${t}" y="${y0}" width="${W-2*t}" height="${y1-y0}" fill="#d6ecf7" stroke="#1b1f23"/>`;if(dim)o+=dimV(y,y+r,W+30*DS,fmt(r),1);y+=r;});
   if(dim){o+=dimH(0,W,H+40*DS,fmt(W));o+=dimV(0,H,-40*DS,fmt(H));}return o;}
+
+/* ═══ إكسسوارات LogiKal (جوانات · كورنرات · وصلات · براغي) — معايرة من قوائم التجميع الحقيقية ═══ */
+function lkAccCalc(p,g,s,k,C){const out={},add=(code,name,n,unit)=>{if(!(n>0))return;const o=out[code]||(out[code]={name,n:0,unit});o.n+=n;};
+  const r2=x=>Math.round(x/10+1e-9)/100,thk=key=>{try{return (gls(infOf(p,key)||p.glass)||{}).t||24}catch(_){return 24}};
+  const cells=(g&&g.cells)||[],bd=k.bd||22,bx=k.bx||1;
+  const cinfo=c=>{const f=String(c.fill||"fixed"),door=f.startsWith("door"),sash=f!=="fixed"&&f!=="panel",t=c.t||{};
+    const bp=sash?2*((c.sw-(t.sb||0))+(c.sh-(t.sbV||0))):2*(c.cw+(c.ch-2*bd));
+    const sp=sash?2*(c.sw+c.sh):0,spd=sash?(c.noSill?2*(c.sw+c.sh)-c.sw:2*(c.sw+c.sh)):0;
+    return {tiltLR:/^tilt[LR]/.test(String(c.fill||""))&&!(c.gw>0),glzA:(c.gw>0)&&!INFILL[infOf(p,c.ci+"-"+c.ri)],f,door,sash,win:sash&&!door,tilt:sash&&!door&&/^tilt/.test(f),cas:sash&&!door&&!/^tilt/.test(f),fix:!sash&&f!=="panel",glz:f!=="panel",bp,sp,spd,gp:2*((c.gw||0)+(c.gh||0)),key:c.ci+"-"+c.ri,ns:!!c.noSill};};
+  const nM=((g&&g.mV)||[]).length+((g&&g.mH)||[]).length,fc=g&&g.lkNoSill?2:4;
+  if(g&&g.kind==="sliding"){const n=g.n||p.sashes||2;(k.acc2||[]).forEach(r=>{const [code,name,on]=r;
+      if(on==="sl"&&typeof r[3]==="string"){const [, , ,base,fa,d,opt={}]=r,t=thk("all");if(opt.tMin!=null&&t<opt.tMin||opt.tMax!=null&&t>opt.tMax)return;const gx=base==="gpx"?2*(g.sw-k.gW+g.sh-k.gH):2*(g.gw+g.gh);add(code,name,r2(n*fa*(gx-d)),"م");}
+      else if(on==="slLin"){const [, , ,fa,T]=r,c=T[n]||T[2];add(code,name,r2(fa*(c[0]*p.W+c[1]*p.H-c[2])),"م");}
+      else if(on==="sl")add(code,name,r[3]*n,"");else if(on==="slPos")add(code,name,r[3],"");});
+    Object.values(out).forEach(o=>{o.n=o.unit?Math.round(o.n*100)/100:Math.round(o.n);});return out;}
+  (k.acc2||[]).forEach(r=>{const [code,name,on]=r;
+    if(typeof r[3]==="string"){const [, , , base,fa,d,opt={}]=r;
+      if(on==="field"&&k.cap){(p.cols||[]).forEach((c0,b)=>{const rs=(p.rows&&p.rows[b])||[p.H],cw=c0-(b===0?k.F:k.M/2)-(b===p.cols.length-1?k.F:k.M/2);rs.forEach((rr,i)=>{const ch=rr-(i===0?k.F:k.M/2)-(i===rs.length-1?k.F:k.M/2),t=thk(b+"-"+i);
+        if(opt.tMin!=null&&t<opt.tMin||opt.tMax!=null&&t>opt.tMax)return;const gp=2*(cw+ch+2*k.gAdd);add(code,name,r2(fa*(gp-d)),"م");});});return;}
+      if(g&&g.lkArch&&on==="fix"){if(!opt.arch)return;const {R:R0,leg}=g.lkArch,F=k.F,sh=leg<F+bd,t=thk("0-0");if(opt.tMin!=null&&t<opt.tMin||opt.tMax!=null&&t>opt.tMax)return;
+        const L=(p.W-2*F-(sh?bd:0))+(sh?0:2*(leg-F-bd))+(Math.PI*(R0-F)+(sh?k.arch.sb:0));add(code,name,r2(opt.arch[0]*(L-opt.arch[1])),"م");return;}
+      if(opt.archOnly)return;cells.forEach(c=>{const x=cinfo(c);if(!x[on])return;const t=thk(x.key);if(opt.tMin!=null&&t<opt.tMin||opt.tMax!=null&&t>opt.tMax)return;const md=(c.meetL&&opt.mx!=null)?c.sh+opt.mx:0;add(code,name,r2(fa*(x[base]-d-md)),"م");});}
+    else{const n=r[3];
+      const o4=r[4]||{};if((o4.minSide&&Math.min(p.W,p.H)<o4.minSide)||(o4.minH&&p.H<o4.minH)){if(on==="fcorner")add(o4.alt[0],o4.alt[1],n*fc,"");return;}
+      if(false){}else if(on==="mull"){const bm=o4.byMull,mc=p.mullP?lkPc(k,p.mullP):(k.code&&k.code.mull);add(code,name,(bm&&bm[mc]!=null?bm[mc]:n)*nM,"");}
+      else if(on==="meet")add(code,name,n*(((g&&g.meets)||[]).length),"");else if(on==="pos")add(code,name,n,"");else if(on==="fcorner")add(code,name,n*fc,"");
+      else if(on==="field"&&k.cap)add(code,name,n*(p.cols||[]).reduce((a,_,b)=>a+(((p.rows&&p.rows[b])||[1]).length),0),"");
+      else if(on==="dcorner")cells.forEach(c=>{const x=cinfo(c);if(x.door)add(code,name,n*(x.ns?2:4),"");});
+      else if(on==="doorNS")cells.forEach(c=>{const x=cinfo(c);if(x.door&&x.ns)add(code,name,n,"");});
+      else cells.forEach(c=>{const x=cinfo(c);if(!x[on])return;if(o4.minSh&&c.sh<o4.minSh&&(!o4.bh||/^tilt[T]?$/.test(c.fill)))add(o4.alt[0],o4.alt[1],n,"");else add(code,name,n,"");});}});
+  if(k.cap){const cv=!!p.capV,mc=(p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull),is8=mc==="5008";
+    const pl=[];(C||[]).forEach(c=>{if(c.pcode===k.code.press)for(let i=0;i<c.n/(p.qty||1);i++)pl.push({len:c.len,h:/أفقي|عارضة/.test(c.name)});});
+    const nb=(p.cols||[]).length,nT=(p.cols||[]).reduce((a,_,b)=>a+((((p.rows&&p.rows[b])||[1]).length)-1),0);
+    const nCon=cv?2*(2*nb+nT):2*(2+nT+(nb-1));
+    add(is8?"5042(30,5)":"01 130176",is8?"U Connection":"KT 5042-605 Corner Cleat",nCon,"");add(is8?"AKS667":"AKS669",is8?"50'lik Genlesme Lastigi -Yaka":"80'lik Genlesme Lastigi - Yaka",nCon,"");add("AKS2276","4.8*32 YSB-MU Vida",3*nCon,"");
+    const tg=thk("0-0"),thin=tg<=24;
+    pl.forEach(x=>{const n=Math.ceil((x.len-100)/300)+1;if(x.h)add(thin?"AKS2348":"AKS2349",thin?"4,8x32 Sac Vidasi/Y.S.B.":"4,8x38 Sac Vidasi/Y.S.B",n,"");else add("AKS2350","4,8x45 Sac Vidasi/Y.S.B.",n,"");});
+    const cov=(C||[]).filter(c=>c.pcode===k.code.fcover).reduce((a,c)=>a+c.len*c.n/(p.qty||1),0),np=pl.length,nf=(p.cols||[]).reduce((a,_,b)=>a+(((p.rows&&p.rows[b])||[1]).length),0);
+    add("AKS1289","Kapak Alti Dis Cam Fitili",r2(2.06*cov+3.64*np+2.47*nf-4.17),"م");
+    if(thin)add("AKS1387","EPDM Conta MF.04",r2(1.03*pl.reduce((a,x)=>a+x.len+28.5,0)),"م");
+    else if(tg>=28)add("AKS1384","EPDM Conta Cephe Uzatma Fitili",r2(1.03*cov+16.38*np+25.49*nf),"م");
+    else add("AKS1386","EPDM Conta MF.07",r2(1.03*cov+14.29*np+27.19*nf-4.3),"م");}
+  Object.values(out).forEach(o=>{o.n=o.unit?Math.round(o.n*100)/100:Math.round(o.n);});
+  return out;}
+function lkAccApply(p,out,s,k,C){if(!k||!k.acc2)return;try{const g=out.g||geom(p),A=lkAccCalc(p,g,s,k,out.cut),q=p.qty||1,acc={};
+  s.accs=s.accs||[];Object.entries(A).forEach(([code,o])=>{if(!s.accs.some(a=>a.code===code))s.accs.push({code,name:o.name,price:0,per:o.unit?"lkM":"lk",qty:0,applies:"all",minH:0,lk:1});acc["c:"+s.id+":"+code]=Math.round(o.n*q*100)/100;});
+  out.acc=acc;out.lkAcc=true;}catch(e){console.warn("lkAcc",e)}}
 
 /* ═══════════ ترتيب "صفوف أولاً": صف كامل فوگ (فوگ الباب/الشباك) وتحته أعمدة ═══════════
    p.tr=true · p.cols = ارتفاعات الصفوف (من فوگ لجوه) · p.rows[i] = عروض خلايا الصف i (من اليسار) · المفتاح "صف-خلية" */
