@@ -581,10 +581,10 @@ function drawPos(p,opt={}){
       const sx=cl.cx-s.ov,sy=cl.cy-s.ov,sw=cl.sw,sh=cl.sh,door=f.startsWith("door"),bt=door?(s.bottom||s.S):s.S;
       o+=`<path d="M${sx} ${sy}h${sw}v${sh}h${-sw}z M${sx+s.S} ${sy+s.S}v${sh-s.S-bt}h${sw-2*s.S}v${-(sh-s.S-bt)}z" fill="${fc2}" fill-rule="evenodd" stroke="#1b1f23" stroke-width="1.4"/>`;
       o+=infR(infOf(p,cl.ci+"-"+cl.ri),sx+s.S,sy+s.S,sw-2*s.S,sh-s.S-bt);
-      // رمز الفتح: رأس المثلث جهة المفصلات
+      // رمز الفتح (DIN/LogiKal): الخطوط من زوايا المفصلات ورأس المثلث جهة اليدة
       const hingeLeft=/L$/.test(f),gx1=sx+s.S,gx2=sx+sw-s.S,gy1=sy+s.S,gy2=sy+sh-bt;
       const hx=hingeLeft?gx1:gx2,ox=hingeLeft?gx2:gx1;
-      if(f!=="tilt"&&f!=="tiltT")o+=`<path d="M${ox} ${gy1}L${hx} ${(gy1+gy2)/2}L${ox} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
+      if(f!=="tilt"&&f!=="tiltT")o+=`<path d="M${hx} ${gy1}L${ox} ${(gy1+gy2)/2}L${hx} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
       if(f==="tiltT")o+=`<path d="M${gx1} ${gy1}L${(gx1+gx2)/2} ${gy2}L${gx2} ${gy1}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
       else if(f.startsWith("tilt"))o+=`<path d="M${gx1} ${gy2}L${(gx1+gx2)/2} ${gy1}L${gx2} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
       // المقبض
@@ -2008,7 +2008,7 @@ function drawTrBody(p,g,s,fc,fc2,dim){let o=ring(0,0,p.W,p.H,s.F,fc);const W=p.W
     const hingeLeft=/L$/.test(f),gx1=sx+S,gx2=sx+sw-S,gy1=sy+S,gy2=sy+sh-bt,hx=hingeLeft?gx1:gx2,ox=hingeLeft?gx2:gx1;
     if(f==="tiltT")o+=`<path d="M${gx1} ${gy1}L${(gx1+gx2)/2} ${gy2}L${gx2} ${gy1}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
     else if(f==="tilt")o+=`<path d="M${gx1} ${gy2}L${(gx1+gx2)/2} ${gy1}L${gx2} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
-    else{o+=`<path d="M${ox} ${gy1}L${hx} ${(gy1+gy2)/2}L${ox} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
+    else{o+=`<path d="M${hx} ${gy1}L${ox} ${(gy1+gy2)/2}L${hx} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
       if(f.startsWith("tilt"))o+=`<path d="M${gx1} ${gy2}L${(gx1+gx2)/2} ${gy1}L${gx2} ${gy2}" fill="none" stroke="#1b1f23" stroke-width="1.6" stroke-dasharray="14 8"/>`;
       const hdx=hingeLeft?sx+sw-S/2:sx+S/2,hdy=door?sy+sh*.52:sy+sh/2;
       o+=door?`<rect x="${hdx-6}" y="${hdy-160}" width="12" height="320" rx="6" fill="#b8bdc2" stroke="#666"/>`:`<rect x="${hdx-5}" y="${hdy-45}" width="10" height="90" rx="4" fill="#2b2f33"/>`;}
