@@ -602,6 +602,8 @@ function drawPos(p,opt={}){
   }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
   }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
   }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
+  }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
+  }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
   }else{
     o+=ring(0,0,W,H,s.F,fc);
     // قوائم وعوارض
@@ -771,6 +773,7 @@ function renderProps(){
     h+=`<div class="row2"><div class="fld"><label>عدد الدرف</label><select data-k="sashes">${[2,3,4].map(n=>`<option ${p.sashes==n?"selected":""}>${n}</option>`).join("")}</select></div>
      <div class="fld"><label>منخل</label><select data-k="net"><option value="1" ${p.net?"selected":""}>نعم</option><option value="0" ${!p.net?"selected":""}>لا</option></select></div></div>`;
   }
+  if(s.lk&&s.lk.doorNS&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door"))){h+=`<div class="fld"><label>عتبة الباب</label><select data-k="noSill"><option value="0" ${!p.noSill?"selected":""}>مع جرجوب سفلي (عتبة)</option><option value="1" ${p.noSill?"selected":""}>بدون عتبة — زت سفلي ${esc((s.lk.code&&s.lk.code.bot)||"")}</option></select></div>`;}
   if(s.lk&&s.lk.code&&typeof lkProfHtml==="function"){h+=`<details open><summary style="cursor:pointer;font-size:.82rem;color:#2b5797;margin:4px 0 6px">مقاطع LogiKal المعتمدة</summary>${lkProfHtml(s)}</details>`;}else if(s.kind!=="facade"&&LIB[s.id]){const L=LIB[s.id],RL={frame:"الإطار",sash:"الدرفة",mull:"القائم/العارضة",inter:"الإنترلوك",bead:"خرزة الزجاج",net:"المنخل",slat:"الشريحة",box:"الصندوق"};
     const roles=Object.keys(RL).filter(r=>L.some(x=>x[5]===r)&&(r!=="mull"||isGrid(s))&&(r!=="inter"&&r!=="net"||s.kind==="sliding")&&(r!=="slat"&&r!=="box"||s.kind==="shutter"));
     h+=`<details ${roles.length?"open":""}><summary style="cursor:pointer;font-size:.82rem;color:#2b5797;margin:4px 0 6px">مقاطع Akpa (${L.length} مقطع بالكتالوج)</summary>`+roles.map(r=>`<div class="fld"><label>مقطع ${RL[r]}</label><select data-k="${r}P">${L.filter(x=>x[5]===r).map(x=>`<option value="${x[0]}" ${x[0]===(p[r+"P"]||defRole(s.id,r))?"selected":""}>${x[0]} — ${esc(x[1])} · ${x[2]} كغم/م${x[3]?" · Jx "+x[3]:""}</option>`).join("")}</select></div>`).join("")+`</details>`;}
@@ -784,7 +787,7 @@ function renderProps(){
   else if(isGrid(s)){
     h+=`<div class="sec"><h3>التقسيم (أعمدة وصفوف)</h3>
      <div class="fld"><label>عروض الأعمدة مم (افصل بفاصلة)</label><input data-k="colsTxt" value="${p.cols.join(", ")}"></div>
-     <div class="chips" style="margin-bottom:8px"><button class="chip" data-split="c2" type="button">عمودين متساوية</button><button class="chip" data-split="c3" type="button">3 أعمدة</button><button class="chip" data-split="r2" type="button">+ عارضة فوگ الخلية</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="reset" type="button">بدون تقسيم</button></div>`;
+     <div class="chips" style="margin-bottom:8px"><button class="chip" data-split="c2" type="button">عمودين متساوية</button><button class="chip" data-split="c3" type="button">3 أعمدة</button><button class="chip" data-split="r2" type="button">+ عارضة فوگ الخلية</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="reset" type="button">بدون تقسيم</button></div>`;
     p.cols.forEach((_,ci)=>{h+=`<div class="fld"><label>ارتفاعات العمود ${ci+1} مم (من فوگ لجوه)</label><input data-rows="${ci}" value="${(p.rows[ci]||[p.H]).join(", ")}"></div>`;});
     h+=`<div class="hint">اضغط على الخلية حتى تختار نوعها:</div><div class="grid-ed" style="grid-template-columns:${p.cols.map(c=>c+"fr").join(" ")}">`;
     p.cols.forEach((_,ci)=>{h+=`<div style="display:grid;gap:4px;grid-template-rows:${(p.rows[ci]||[p.H]).map(r=>r+"fr").join(" ")}">`;(p.rows[ci]||[p.H]).forEach((_,ri)=>{const k=ci+"-"+ri;h+=`<button type="button" class="cellbtn ${k===selCell?"on":""}" data-cell="${k}">${FILLS[p.cells[k]||"fixed"]}</button>`;});h+=`</div>`;});
@@ -860,6 +863,7 @@ $("props").addEventListener("change",e=>{
     if(k==="qty"&&p.type)p.qty=Math.max(0,+t.value||0);else if(k==="price")p.price=+t.value||0;else if(k==="qty"||k==="sashes")p[k]=Math.max(1,+t.value||1);
     else if(k==="net")p.net=t.value==="1";
     else if(k==="motor")p.motor=t.value==="1";
+    else if(k==="noSill")p.noSill=t.value==="1";
     else if(k==="shutter")p.shutter=t.checked;
     else p[k]=t.value;
   });
@@ -1864,17 +1868,17 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=7;
+const LKCAL_V=9;
 const LKCAL={
   ak_wd37:{grid:1,F:36.5,M:45,mBy:{"713":24,"714":45},ov:5.8,bd:22,g0:10,
     win:{sb:82,sbV:126},door:{sb:146,sbV:215,noSill:1,gap:10,bot:146,code:"692"},doorO:{sb:146,sbV:190,code:"691"},
     code:{frame:"708",sash:"710",mull:"714",bead:"770",bot:"715"}},
   ak_wd50t:{grid:1,F:36,M:36,ov:6,bd:22,g0:10,
-    win:{sb:86,sbV:130},door:{sb:148,sbV:192,code:"651-652"},
-    code:{frame:"643-644",sash:"647-648",mull:"657-658",bead:"664"}},
+    win:{sb:86,sbV:130},door:{sb:148,sbV:192,code:"651-652"},tilt:{sb:106,sbV:150,code:"649-650"},rod:1,rodDed:200,
+    code:{frame:"643-644",sash:"647-648",mull:"657-658",bead:"664",rod:"8241"}},
   ak_wd70t:{grid:1,F:40,M:37,ov:6,bd:22,g0:10,
-    win:{sb:107.6,sbV:151.6},tilt:{ov:5,sb:88,sbV:132,code:"7008-7009"},door:{sb:149,sbV:193,code:"7013-7019"},
-    beadT:[[12,"676"],[99,"7043"]],code:{frame:"7000-7002",sash:"7011-7018",mull:"7046-7047",bead:"7043"}},
+    win:{sb:107.6,sbV:151.6},tilt:{ov:5,sb:88,sbV:132,code:"7008-7009"},door:{sb:149,sbV:193,code:"7013-7019"},doorNS:{gap:10,bot:149,sbV:226.5},
+    beadT:[[12,"676"],[99,"7043"]],code:{frame:"7000-7002",sash:"7011-7018",mull:"7046-7047",bead:"7043",bot:"7028-7030"}},
   ak_wd55:{grid:1,F:42,M:42,ov:5,bd:22,g0:10,rod:1,
     win:{sb:91,sbV:135},door:{sb:176,sbV:220,code:"1660"},
     code:{frame:"1686",sash:"1691",mull:"1694",bead:"1745",rod:"8241"}},
@@ -1925,7 +1929,7 @@ geom=function(p){const s=sys(p.sys),k=s&&s.lk;if(!k||p.type)return _geom0(p);
   const fillAt=(b,i)=>String(p.cells[b+"-"+i]||"fixed"),items=b=>p.rows[b]||[tr?W:H],nb=p.cols.length;
   const isIn=f=>f.startsWith("door")&&!f.startsWith("doorO");
   const bottomCells=tr?items(nb-1).map((_,i)=>[nb-1,i]):p.cols.map((_,b)=>[b,items(b).length-1]);
-  const noSill=k.aldoks?bottomCells.some(([b,i])=>fillAt(b,i).startsWith("door")):!!(k.door&&k.door.noSill)&&bottomCells.every(([b,i])=>isIn(fillAt(b,i)));
+  const noSill=k.aldoks?bottomCells.some(([b,i])=>fillAt(b,i).startsWith("door")):!!((k.door&&k.door.noSill)||(p.noSill&&k.doorNS))&&bottomCells.every(([b,i])=>isIn(fillAt(b,i)));
   const hasMeet=!!(k.door&&k.door.meet!=null);
   const meetBand=b=>hasMeet&&!tr&&b<nb-1&&items(b).length===1&&items(b+1).length===1&&fillAt(b,0).startsWith("door")&&fillAt(b+1,0).startsWith("door");
   const meetItem=(b,i)=>hasMeet&&tr&&i<items(b).length-1&&fillAt(b,i).startsWith("door")&&fillAt(b,i+1).startsWith("door");
@@ -1949,7 +1953,7 @@ geom=function(p){const s=sys(p.sys),k=s&&s.lk;if(!k||p.type)return _geom0(p);
           if(!INFILL[inf]&&!(!expl&&/أباجور|شباج|louver/i.test(p.name||""))){c.gz=1;c.iw=r1(c.sw-D.sb);c.ih=r1(c.sh-2*D.top);c.gw=Math.round(c.iw-10);c.gh=Math.round(c.ih-10);
             c.fW=`زت ${fmt(c.sw,1)} − ${D.sb+10}`;c.fH=`زت ${fmt(c.sh,1)} − ${D.sb+10}`;}}
         cells.push(c);return;}
-      if(fill!=="fixed"&&fill!=="panel"){const tt=lkType(k,fill),ns=door&&noSill&&isBottom,ov=tt.ov!=null?tt.ov:k.ov;
+      if(fill!=="fixed"&&fill!=="panel"){const ns=door&&noSill&&isBottom,tt0=lkType(k,fill),tt=ns&&k.doorNS?{...tt0,...k.doorNS}:tt0,ov=tt.ov!=null?tt.ov:k.ov;
         c.ffW=cw2;c.ffH=ch2;c.sw=r1(cw2+2*ov);c.sh=r1(ns?ch2+ov-(tt.gap||0):ch2+2*ov);c.noSill=ns;c.t=tt;
         const dW=tt.sb+k.g0,dH=r1(tt.sbV-2*k.bd+k.g0);
         c.gw=Math.round(c.sw-dW);c.gh=Math.round(c.sh-dH);c.fW=`زت ${fmt(c.sw,1)} − ${dW}`;c.fH=`زت ${fmt(c.sh,1)} − ${dH}`;}
@@ -2032,7 +2036,7 @@ bom=function(p){const s=sys(p.sys),k=s&&s.lk;
       addC((door?"زت باب":"زت")+" — أفقي "+tag,c.sw,"45°",c.noSill?1:2,"sash",sc);addC((door?"زت باب":"زت")+" — عمودي "+tag,c.sh,"45°",2,"sash",sc);
       if(c.noSill)addC("عتبة باب سفلية "+tag,c.sw-t.bot,"90°",1,"sash",C.bot);
       addC("ماسكة زجاج — أفقي "+tag,c.sw-t.sb,"90°",2*bx,"bead",C.bead);addC("ماسكة زجاج — عمودي "+tag,c.sh-t.sbV,"90°",2*bx,"bead",C.bead);
-      if(k.rod&&/^tilt/.test(c.fill))addC("تيج (قضيب) "+tag,c.sw,"90°",1,"other",C.rod);
+      if(k.rod&&/^tilt/.test(c.fill))addC("تيج (قضيب) "+tag,r1((/^tilt[LR]/.test(c.fill)?c.sh:c.sw)-(k.rodDed||0)),"90°",1,"other",C.rod);
       if(k.leaf){addC("أدابتور 700 — أفقي "+tag,c.sw+15.6,"135°",1,"other",C.ad2);addC("أدابتور 700 — عمودي "+tag,p.H-72.5,"135°",2,"other",C.ad2);}
       addG(c.gw,c.gh,1,(door?"باب ":"زت ")+tag,c.fW,c.fH,c.ci+"-"+c.ri);});
     if(k.leaf&&leaves){addC("أدابتور 704 — أفقي",p.W-90.4,"45°",1,"other",C.ad1);addC("أدابتور 704 — عمودي",p.H-45.2,"45°",2,"other",C.ad1);}
