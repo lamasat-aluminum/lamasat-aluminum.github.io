@@ -449,6 +449,8 @@ function geom(p){
 }
 function validate(p){
   const s=sys(p.sys),e=[];if(p.type)return e;
+  if(isGrid(s)&&s.lk){try{const g=geom(p),yM=Math.max(...g.cells.map(c=>c.y1));g.cells.forEach(c=>{if(String(c.fill).startsWith("door")&&Math.abs(c.y1-yM)>1)e.push(`الخلية ${c.ci+1}-${c.ri+1} مختارة «باب» بس ما توصل للگاع — إذا شباك اختار «مفصلي» حتى يطلع القص مثل LogiKal`);});
+    if(s.lk.aldoks)g.cells.forEach(c=>{if((c.gz||c.door||c.fill==="fixed")&&!INFILL[infOf(p,c.ci+"-"+c.ri)]){try{if(!gInfo(gls(infOf(p,c.ci+"-"+c.ri))).dbl&&!e.some(x=>x.includes("مفرد")))e.push("الزجاج مفرد — ماسكة الزجاج تطلع 105. إذا الزجاج دبل غيّره حتى تطلع 104 مثل LogiKal");}catch(_){}}});}catch(_){}}
   if(p.W<300||p.H<300)e.push("القياس صغير جداً (أقل من 300مم).");
   if(isGrid(s)&&p.tr){const sh=p.cols.reduce((a,b)=>a+ +b,0);if(Math.abs(sh-p.H)>0.5)e.push(`مجموع ارتفاعات الصفوف ${fmt(sh)} ≠ الارتفاع ${fmt(p.H)}`);
     p.rows.forEach((r,i)=>{const sw=r.reduce((a,b)=>a+ +b,0);if(Math.abs(sw-p.W)>0.5)e.push(`مجموع عروض الصف ${i+1} = ${fmt(sw)} ≠ العرض ${fmt(p.W)}`)});
