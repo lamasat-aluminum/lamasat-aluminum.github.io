@@ -597,6 +597,7 @@ function drawPos(p,opt={}){
   }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
   }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
   }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
+  }else if(p.tr&&typeof drawTrBody==="function"){o+=drawTrBody(p,g,s,fc,fc2,dim);
   }else{
     o+=ring(0,0,W,H,s.F,fc);
     // قوائم وعوارض
@@ -779,7 +780,7 @@ function renderProps(){
   else if(isGrid(s)){
     h+=`<div class="sec"><h3>التقسيم (أعمدة وصفوف)</h3>
      <div class="fld"><label>عروض الأعمدة مم (افصل بفاصلة)</label><input data-k="colsTxt" value="${p.cols.join(", ")}"></div>
-     <div class="chips" style="margin-bottom:8px"><button class="chip" data-split="c2" type="button">عمودين متساوية</button><button class="chip" data-split="c3" type="button">3 أعمدة</button><button class="chip" data-split="r2" type="button">+ عارضة فوگ الخلية</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="reset" type="button">بدون تقسيم</button></div>`;
+     <div class="chips" style="margin-bottom:8px"><button class="chip" data-split="c2" type="button">عمودين متساوية</button><button class="chip" data-split="c3" type="button">3 أعمدة</button><button class="chip" data-split="r2" type="button">+ عارضة فوگ الخلية</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="fan" type="button">＋ صف كامل فوگ</button><button class="chip" data-split="reset" type="button">بدون تقسيم</button></div>`;
     p.cols.forEach((_,ci)=>{h+=`<div class="fld"><label>ارتفاعات العمود ${ci+1} مم (من فوگ لجوه)</label><input data-rows="${ci}" value="${(p.rows[ci]||[p.H]).join(", ")}"></div>`;});
     h+=`<div class="hint">اضغط على الخلية حتى تختار نوعها:</div><div class="grid-ed" style="grid-template-columns:${p.cols.map(c=>c+"fr").join(" ")}">`;
     p.cols.forEach((_,ci)=>{h+=`<div style="display:grid;gap:4px;grid-template-rows:${(p.rows[ci]||[p.H]).map(r=>r+"fr").join(" ")}">`;(p.rows[ci]||[p.H]).forEach((_,ri)=>{const k=ci+"-"+ri;h+=`<button type="button" class="cellbtn ${k===selCell?"on":""}" data-cell="${k}">${FILLS[p.cells[k]||"fixed"]}</button>`;});h+=`</div>`;});
@@ -2004,7 +2005,7 @@ bom=function(p){const s=sys(p.sys),k=s&&s.lk;
         addC("شفرة لوفر "+tag,c.cw-3,"90°",Math.ceil(Lv/k.pitchL),"sash",C.louver);panels.push({w:Math.round(c.cw),h:Math.round(c.ch),n:q,label:"لوفر "+tag,kind:"louver",name:INFILL.louver});return;}
       if(INFILL[inf]||c.fill==="panel"){const Lv=c.ch-34;addC("ماسكة — أفقي "+tag,c.cw,"90°",2,"bead",C.bead);addC("ماسكة — عمودي "+tag,Lv,"90°",2,"bead",C.bead);
         addC("شريحة لامبري "+tag,c.cw-4,"90°",Math.ceil((Lv+k.addW)/k.pitchW),"sash",C.wains);panels.push({w:Math.round(c.cw),h:Math.round(c.ch),n:q,label:"لامبري "+tag,kind:"lambri",name:INFILL.lambri});return;}
-      addC("ماسكة زجاج — أفقي "+tag,c.cw,"90°",2,"bead",C.gbead);addC("ماسكة زجاج — عمودي "+tag,c.ch-34,"90°",2,"bead",C.gbead);
+      addC("ماسكة زجاج — أفقي "+tag,c.cw,"90°",2,"bead",gb(inf));addC("ماسكة زجاج — عمودي "+tag,c.ch-34,"90°",2,"bead",gb(inf));
       glass.push({w:Math.round(c.cw-10),h:Math.round(c.ch-10),n:q,label:"ثابت "+tag,fW:"",fH:"",gid:inf});});
     addC("زاوية تجميع (كورنر) — جرجوب",k.clF,"—",ns?2:4,"other",C.cleat);if(cS)addC("زاوية تجميع (كورنر) — زت",k.clS,"—",cS,"other",C.cleat);
     if(nM)addC("وصلة تي (تعامد)",k.clF,"—",2*nM-(ns?g.mV.length:0),"other",C.conn);
