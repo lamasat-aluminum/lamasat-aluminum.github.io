@@ -1564,7 +1564,7 @@ function renderWiz(){const b=$("wizBody"),p=WZ.p,s=p&&sys(p.sys);let h=WZ.step==
     if(s.kind==="sliding")h+=`<h3 class="wz-q">كم درفة جرارة؟</h3><div class="wz-num">${[2,3,4,6].map(n=>`<button type="button" class="btn ${p.sashes===n?"p":""}" data-wzsash="${n}">${n} درف</button>`).join("")}</div>
       <label class="wz-chk"><input type="checkbox" id="wzNet" ${p.net?"checked":""}> منخل (مانع ذباب) ${wzHasNet(s)?"— موجود بالسلسلة":""}</label>`;
     else if(s.kind==="shutter")h+=`<h3 class="wz-q">نوع التشغيل</h3><label class="wz-chk"><input type="checkbox" id="wzMotor" ${p.motor?"checked":""}> ماطور كهربائي</label>`;
-    else h+=`<h3 class="wz-q">كم حقل بالعرض وكم حقل بالارتفاع؟</h3><div class="row3"><div class="fld"><label>عدد الحقول بالعرض (أعمدة)</label><input type="number" min="1" max="8" id="wzNC" value="${WZ.nc}"></div><div class="fld"><label>عدد الحقول بالارتفاع (صفوف)</label><input type="number" min="1" max="5" id="wzNR" value="${WZ.nr}"></div></div>
+    else h+=`<h3 class="wz-q">كم حقل بالعرض وكم حقل بالارتفاع؟</h3><div class="row3"><div class="fld"><label>عدد الحقول بالعرض (أعمدة)</label><input type="number" min="1" max="60" id="wzNC" value="${WZ.nc}"></div><div class="fld"><label>عدد الحقول بالارتفاع (صفوف)</label><input type="number" min="1" max="40" id="wzNR" value="${WZ.nr}"></div></div>
       <p class="hint">أشكال جاهزة:</p><div class="wz-num">${[[1,1],[2,1],[3,1],[1,2],[2,2],[3,2],[4,2]].map(([c,r])=>`<button type="button" class="btn ${WZ.nc===c&&WZ.nr===r?"p":""}" data-wzshape="${c},${r}">${c} × ${r}</button>`).join("")}</div>`;
     h+=`<div class="wz-prev">${drawPos(p)}</div>`;}
   else if(WZ.step===3){h+=`<h3 class="wz-q">القياسات (مم) — قياس الفتحة الخارجي للإطار</h3><div class="row3"><div class="fld"><label>العرض الكلي</label><input type="number" id="wzW" value="${p.W}"></div><div class="fld"><label>الارتفاع الكلي</label><input type="number" id="wzH" value="${p.H}"></div><div class="fld"><label>العدد (كم قطعة بنفس الشكل)</label><input type="number" min="1" id="wzQty" value="${p.qty}"></div></div>`;
@@ -1637,7 +1637,7 @@ document.addEventListener("change",e=>{const t=e.target;if(!t.closest||!t.closes
   else if(t.id==="wzNetC")p.netC=t.checked;
   else if(t.id==="wzMotor")p.motor=t.checked;
   else if(t.id==="wzName"){p.name=t.value;return;}
-  else if(t.id==="wzNC"||t.id==="wzNR"){WZ.nc=Math.max(1,Math.min(8,+$("wzNC").value||1));WZ.nr=Math.max(1,Math.min(5,+$("wzNR").value||1));wzApplyGrid(true);}
+  else if(t.id==="wzNC"||t.id==="wzNR"){WZ.nc=Math.max(1,Math.min(60,+$("wzNC").value||1));WZ.nr=Math.max(1,Math.min(40,+$("wzNR").value||1));wzApplyGrid(true);}
   else if(t.id==="wzQty")p.qty=Math.max(1,+t.value||1);
   else if(t.id==="wzW"){p.W=Math.max(300,+t.value||p.W);if(isGrid(s)){p.cols=wzSplit(p.W,p.cols.length);wzApplyGrid(false);}}
   else if(t.id==="wzH"){p.H=Math.max(300,+t.value||p.H);if(isGrid(s)){const k=WZ.rh.length;WZ.rh=k===1?[p.H]:[...WZ.rh.slice(0,-1)];if(k>1){const sum=WZ.rh.reduce((a,b)=>a+b,0);if(sum>=p.H-150)WZ.rh=wzSplit(p.H,k).slice(0,-1);WZ.rh.push(p.H-WZ.rh.reduce((a,b)=>a+b,0));}wzApplyGrid(false);}}
