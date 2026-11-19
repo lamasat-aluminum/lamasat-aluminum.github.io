@@ -601,6 +601,7 @@ function drawPos(p,opt={}){
       const rs=p.rows[cl.ci]||[];
       if(cl.ri<rs.length-1){const l=cl.x0+(cl.ci===0?s.F:s.M/2),r=cl.x1-(cl.ci===p.cols.length-1?s.F:s.M/2);o+=`<rect x="${l}" y="${cl.y1-s.M/2}" width="${r-l}" height="${s.M}" fill="${fc}" stroke="#1b1f23" stroke-width="1.2"/>`;}
       const f=cl.fill;
+      if(f==="open"){o+=`<rect x="${cl.cx}" y="${cl.cy}" width="${cl.cw}" height="${cl.ch}" fill="#fff" stroke="#9aa5b1" stroke-dasharray="10 8"/><text x="${cl.cx+cl.cw/2}" y="${cl.cy+cl.ch/2}" font-size="${Math.max(60,Math.min(cl.cw,cl.ch)/8)}" text-anchor="middle" fill="#9aa5b1">فتحة</text>`;return;}
       if(f==="fixed"){o+=infR(infOf(p,cl.ci+"-"+cl.ri),cl.cx+6,cl.cy+6,cl.cw-12,cl.ch-12,1);return;}
       if(f==="panel"){o+=`<rect x="${cl.cx+4}" y="${cl.cy+4}" width="${cl.cw-8}" height="${cl.ch-8}" fill="${fc2}" stroke="#1b1f23"/><rect x="${cl.cx+4}" y="${cl.cy+4}" width="${cl.cw-8}" height="${cl.ch-8}" fill="url(#hatch)"/>`;return;}
       const sx=cl.cx-s.ov,sy=cl.cy-s.ov,sw=cl.sw,sh=cl.sh,door=f.startsWith("door"),bt=door?(s.bottom||s.S):s.S;
@@ -1872,7 +1873,7 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=18;
+const LKCAL_V=19;
 const LKCAL={
   ak_wd37:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:19}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:19.1}],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -1947,6 +1948,7 @@ const LKCAL={
   ak_ts29:{acc2:[["AKS1447","Epdm Lastik Contasi 2300","sl","gpx",2.06,148,{tMax:8}],["AKS1535","Firca Fitil (FC.707)","slLin",1.03,{2:[4,6,172],4:[4,8,39]}]],slide:1,hDed:40,I:17,wDed:0,gW:92,gH:92,bW:84,bH:114,cover:0,n4:{add:71.4,code:"137",n:2},beadT:[[4,"136"],[99,"138"]],
     code:{frame:"1242",sash:"132",inter:"135",bead:"138"}},
   ak_fs50eco:{facade:1,tDed:4,fDed:-30},
+  ak_fs50s:{ssg:1,F:50,M:50,code:{mull:"5006",fr:"5027",sash:"5062",blk:"5094"},acc2:[]},
   ak_fs50k:{acc2:[["AKS681","Cam Destek Takozu 50mm CT 33","field",2],
       ["AKS1243","Cephe Cam Fitili (24mm)","field","gp",1.03,120,{tMax:24}],["AKS1244","Cephe Cam Fitili (9mm)","field","gp",1.03,120,{tMin:25,tMax:28}],["AKS1237","FS50ECO-CF.03","field","gp",1.03,120,{tMin:29}]],
     cap:1,F:50,M:50,gAdd:30,mDed:4,mulls:["5006","5008"],code:{fcover:"2006",mull:"5006",press:"5048"}}
@@ -1981,6 +1983,17 @@ const lkK=(p,s)=>{const k=s&&s.lk;if(!k)return k;if(k.frameAlt&&p.frameP&&k.fram
 const lkSdiv=(p,key,ih,M)=>{const v=String((p.sdiv&&p.sdiv[key])||p["sd_"+key]||"").split(/[,،\s]+/).map(Number).filter(x=>x>0);if(!v.length)return [r1(ih)];
   const n=v.length+1,used=v.reduce((a,b)=>a+b,0)+(n-1)*M,last=r1(ih-used);if(last<=50)return [r1(ih)];return [...v.map(r1),last];};
 const lkSfInf=(p,key,j)=>{const z=(p.sfinf&&p.sfinf[key])||p["sf_"+key];if(z){const a=String(z).split(",");if(a[j]&&a[j]!=="g")return a[j];if(a[j]==="g")return infOf(p,key)&&!INFILL[infOf(p,key)]?infOf(p,key):p.glass;}return infOf(p,key);};
+/* واجهة FS50 سيليكون: هندسة الأعمدة والعوارض والحقول (الحقل "open" = فتحة بدون زجاج) */
+function lkSsg(p){const H=p.H,cols=p.cols||[p.W],nb=cols.length,o=(e)=>e?32.1:7.1,R=b=>(p.rows&&p.rows[b])||[H],emp=(b,i)=>((p.cells||{})[b+"-"+i]==="open");
+  const verts=[],hors=[],panes=[];
+  const topEmpty=(bs)=>{const rs=R(bs[0]);let k=0,sum=0;for(let i=0;i<rs.length;i++){if(bs.every(b=>emp(b,i))){k++;sum+=rs[i];}else break;}return k?r1(H-sum+25):H;};
+  verts.push({nm:"محيط يسار",L:topEmpty([0])});verts.push({nm:"محيط يمين",L:topEmpty([nb-1])});
+  for(let b=0;b<nb-1;b++)verts.push({nm:"وسطي",L:topEmpty([b,b+1])});
+  cols.forEach((c,b)=>{const rs=R(b),n=rs.length,cl=r1(c-(b===0?50:25)-(b===nb-1?50:25)-4),w=r1(c-o(b===0)-o(b===nb-1));
+    for(let j=0;j<=n;j++)if((j>0&&!emp(b,j-1))||(j<n&&!emp(b,j)))hors.push({b,L:cl});
+    rs.forEach((r,i)=>{if(emp(b,i))return;panes.push({b,i,w,h:r1(r-o(i===0)-o(i===n-1))});});});
+  return {verts,hors,panes};}
+try{if(typeof FILLS==="object"&&!FILLS.open)FILLS.open="فتحة بدون زجاج (واجهة)";}catch(_){}
 const lkM=(p,s,k)=>{const pc=p.mullP,m=pc&&k.mBy&&k.mBy[lkPc(k,pc)];return m!=null?m:k.M;};
 const _geom0=geom;
 geom=function(p){const s=sys(p.sys),k=lkK(p,s);if(!k||p.type)return _geom0(p);
@@ -2050,6 +2063,16 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
   const addC=(name,len,ang,n,type,code)=>{if(n<=0)return;const kgm=code?lkKg(s,code,type):((s.kg||{})[type]||0);
     cut.push({name:code?`${name} · ${code}`:name,len:r1(len),ang,n:n*q,kgm,type,pk:s.id+":"+type,pcode:code||undefined});};
   const addG=(w,h,n,label,fW="",fH="",key="all")=>{const id=infOf(p,key);if(INFILL[id])panels.push({w,h,n:n*q,label,kind:id,name:INFILL[id]});else glass.push({w,h,n:n*q,label,fW,fH,gid:id});};
+  if(k.ssg){const H=p.H,nb=p.cols.length,C2=k.code,o=(e)=>e?32.1:7.1,rD=x=>Math.floor(x+1e-6),G=lkSsg(p);
+    G.verts.forEach(v=>addC("قائم 5006 — "+v.nm,v.L,"90°",1,"mull",C2.mull));
+    G.hors.forEach(h=>addC(`عارضة 5006 (عمود ${h.b+1})`,h.L,"90°",1,"mull",C2.mull));
+    G.panes.forEach(({b,i,w,h})=>{const tag=`(${b+1}-${i+1})`;
+        addC("إطار زجاج 5027 — أفقي "+tag,w,"45°",2,"frame",C2.fr);addC("إطار زجاج 5027 — عمودي "+tag,h,"45°",2,"frame",C2.fr);
+        addC("إطار سيليكون 5062 — أفقي "+tag,w,"45°",2,"sash",C2.sash);addC("إطار سيليكون 5062 — عمودي "+tag,h,"45°",2,"sash",C2.sash);
+        addC("قطعة 5094 (50مم) "+tag,50,"90°",8,"other",C2.blk);
+        addG(rD(w),rD(h),1,`حقل ${tag}`,`إطار 5027 ${fmt(w,1)}`,`إطار 5027 ${fmt(h,1)}`,b+"-"+i);});
+    cut.forEach(c=>{c.kg=c.len/1000*c.n*c.kgm;});
+    {const out={...res,cut,glass,panels};lkAccApply(p,out,s,k,null);return out;}}
   if(k.cap){const F=k.F,M=k.M,W=p.W,H=p.H,nb=p.cols.length,mc=p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull;
     const rU=x=>Math.round(x*10+1e-7)/10,rD=x=>Math.floor(x*10+1e-6)/10;
     const trio=(nm,len,n,ded)=>{addC("غطاء خارجي — "+nm,rU(len),"90°",n,"other",k.code.fcover);addC("قائم/عارضة — "+nm,rU(len-ded),"90°",n,"mull",mc);addC("شريحة ضغط — "+nm,rD(len),"90°",n,"other",k.code.press);};
@@ -2157,6 +2180,7 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
   const out={...res,cut,glass,panels:panels.length?panels:(k.aldoks?[]:res.panels)};lkAccApply(p,out,s,k,null);return out;
 };
 try{if(!ST().systems.find(x=>x.id==="ak_fs50k")){const b0=ST().systems.find(x=>x.id==="fs50")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50k",name:"Akpa FS50 كبكلي (غطاء ضغط) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:1.4,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
+try{if(!ST().systems.find(x=>x.id==="ak_fs50s")){const b0=ST().systems.find(x=>x.id==="ak_fs50k")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50s",name:"Akpa FS50 سيليكون (SSG) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:0.6,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 lkCal();
 try{const G=ST().glass;if(!G.find(g=>g.id==="s4"))G.push({id:"s4",ug:5.9,n:"مفرد شفاف 4مم",t:4,price:15000,layers:[4]});
   [["d686","دبل 6/8/6 = 20مم",20,[6,8,6]],["d6106","دبل 6/10/6 = 22مم",22,[6,10,6]],["d6126","دبل 6/12/6 = 24مم",24,[6,12,6]]].forEach(([id,n,t,L])=>{if(!G.find(g=>g.id===id))G.push({id,ug:2.8,n,t,price:(G.find(g=>g.id==="d4164")||{}).price||48000,layers:L});});}catch(_){}
@@ -2225,6 +2249,13 @@ function lkAccCalc(p,g,s,k,C){const out={},add=(code,name,n,unit)=>{if(!(n>0))re
       else if(on==="dcorner")cells.forEach(c=>{const x=cinfo(c);if(x.door)add(code,name,n*(x.ns?2:4),"");});
       else if(on==="doorNS")cells.forEach(c=>{const x=cinfo(c);if(x.door&&x.ns)add(code,name,n,"");});
       else cells.forEach(c=>{const x=cinfo(c);if(!x[on])return;if(o4.minSh&&c.sh<o4.minSh&&(!o4.bh||/^tilt[T]?$/.test(c.fill)))add(o4.alt[0],o4.alt[1],n,"");else add(code,name,n,"");});}});
+  if(k.ssg){const G=lkSsg(p),S=G.verts.reduce((a,v)=>a+v.L,0)+G.hors.reduce((a,h)=>a+h.L,0);
+    G.panes.forEach(({w,h})=>{
+        add("AKS1239","Epdm Conta (SSG ic)",r2(1.03*(2*(w+h)-295.2)),"م");add("AKS1261","Epdm Conta (SSG dis)",r2(1.03*2*(w+h)),"م");
+        add("01 130156","Kose Takozu",4,"");add("01 130183","Kose Baglanti",4,"");add("20000107","Plastik Kose Alt Takozu",2,"");
+        add("AKS2350","4,8x45 Sac Vidasi/Y.S.B.",2*Math.ceil((w-100)/400-1e-9)+2,"");add("AKS2351","Vida (SSG)",2*Math.ceil((h-100)/400-1e-9)+2,"");});
+    const nCon=2*G.hors.length;add("AKS1244","EPDM Conta (5006)",r2(2.06*S),"م");add("AKS1305","EPDM Conta (5006 ic)",r2(1.03*(S+27*nCon)),"م");
+    add("01 130176","KT 5042-605 Corner Cleat",nCon,"");add("AKS669","80'lik Genlesme Lastigi - Yaka",nCon,"");add("AKS2276","4.8*32 YSB-MU Vida",3*nCon,"");}
   if(k.cap){const cv=!!p.capV,mc=(p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull),is8=mc==="5008";
     const pl=[];(C||[]).forEach(c=>{if(c.pcode===k.code.press)for(let i=0;i<c.n/(p.qty||1);i++)pl.push({len:c.len,h:/أفقي|عارضة/.test(c.name)});});
     const nb=(p.cols||[]).length,nT=(p.cols||[]).reduce((a,_,b)=>a+((((p.rows&&p.rows[b])||[1]).length)-1),0);
