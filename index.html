@@ -772,6 +772,7 @@ function renderProps(){
   if(s.lk&&s.lk.door&&s.lk.door.alts&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door"))){const L=[s.lk.door.code,...s.lk.door.alts],v=String(p.doorP||s.lk.door.code);h+=`<div class="fld"><label>مقطع زت الباب</label><select data-k="doorP">${L.map(c=>`<option value="${c}" ${c===v?"selected":""}>${c}</option>`).join("")}</select></div>`;}
   if(s.lk&&s.lk.beadT){const L=[...new Set(s.lk.beadT.map(x=>x[1]))],v=String(p.beadP||"");h+=`<div class="fld"><label>ماسكة الزجاج</label><select data-k="beadP"><option value="" ${!v?"selected":""}>تلقائي حسب سمك الزجاج</option>${L.map(c=>`<option value="${c}" ${c===v?"selected":""}>${c}</option>`).join("")}</select></div>`;}
   if(s.lk&&s.lk.sdiv&&typeof lkSdivHtml==="function")h+=lkSdivHtml(p,s);
+  if(s.lk&&s.lk.op40){h+=`<div class="fld"><label>أسفل القاطع</label><select data-k="opBot"><option value="track" ${p.opBot!=="frame"?"selected":""}>سكة أرضية 8555+8556</option><option value="frame" ${p.opBot==="frame"?"selected":""}>إطار كامل 8551+8552 (من كل الجهات)</option></select></div><div class="fld"><label>العارضة الأفقية</label><select data-k="opTcont"><option value="" ${!p.opTcont?"selected":""}>مقطّعة لكل عمود (افتراضي LogiKal)</option><option value="1" ${p.opTcont?"selected":""}>مستمرة بطول القاطع</option></select></div>${Object.values(p.cells||{}).some(f=>String(f).startsWith("door"))?`<div class="fld"><label>نوع إطار الباب</label><select data-k="opDoor"><option value="" ${p.opDoor!=="inset"?"selected":""}>إطار باب 8554 كامل (افتراضي LogiKal — Type 4)</option><option value="inset" ${p.opDoor==="inset"?"selected":""}>إطار باب داخلي (مثل مشروع 1827 — رأس 8554 أقصر 16.2)</option></select></div>`:""}<div class="hint">✔ معاير على LogiKal (AKA OP 40): الفاصل بين الأعمدة زجاج على زجاج بدون قائم · الباب يكون بالصف السفلي · مشبك 8553 وجلدة ICF 30 تُحسب تلقائياً.</div>`;}
   if(s.lk&&s.lk.cap){const k=s.lk,mc=p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull;h+=`<div class="fld"><label>مقطع القائم/العارضة</label><select data-k="mullP">${k.mulls.map(c=>`<option value="${c}" ${c===mc?"selected":""}>${c}</option>`).join("")}</select></div><div class="fld"><label>طريقة التجميع</label><select data-k="capV"><option value="0" ${!p.capV?"selected":""}>المحيط الأفقي كامل (القوائم بين المحيط)</option><option value="1" ${p.capV?"selected":""}>القوائم مستمرة — المحيط الأفقي مقطّع بين القوائم</option></select></div><div class="hint">✔ معاير على LogiKal: غطاء ${k.code.fcover} + قائم ${mc} + شريحة ضغط ${k.code.press} · الزجاج = الفتحة + ${k.gAdd}</div>`;}
   if(s.lk&&((s.lk.doorNS&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door")))||(s.lk.fixNS&&!p.arch))){h+=`<div class="fld"><label>عتبة الباب</label><select data-k="noSill"><option value="0" ${!p.noSill?"selected":""}>مع جرجوب سفلي (عتبة)</option><option value="1" ${p.noSill?"selected":""}>بدون عتبة — زت سفلي ${esc((s.lk.code&&s.lk.code.bot)||"")}</option></select></div>`;}
   if(s.lk&&s.lk.code&&typeof lkProfHtml==="function"){h+=`<details open><summary style="cursor:pointer;font-size:.82rem;color:#2b5797;margin:4px 0 6px">مقاطع LogiKal المعتمدة</summary>${lkProfHtml(s)}</details>`;}else if(s.kind!=="facade"&&LIB[s.id]){const L=LIB[s.id],RL={frame:"الإطار",sash:"الدرفة",mull:"القائم/العارضة",inter:"الإنترلوك",bead:"خرزة الزجاج",net:"المنخل",slat:"الشريحة",box:"الصندوق"};
@@ -1873,7 +1874,7 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=19;
+const LKCAL_V=20;
 const LKCAL={
   ak_wd37:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:19}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:19.1}],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -1948,6 +1949,7 @@ const LKCAL={
   ak_ts29:{acc2:[["AKS1447","Epdm Lastik Contasi 2300","sl","gpx",2.06,148,{tMax:8}],["AKS1535","Firca Fitil (FC.707)","slLin",1.03,{2:[4,6,172],4:[4,8,39]}]],slide:1,hDed:40,I:17,wDed:0,gW:92,gH:92,bW:84,bH:114,cover:0,n4:{add:71.4,code:"137",n:2},beadT:[[4,"136"],[99,"138"]],
     code:{frame:"1242",sash:"132",inter:"135",bead:"138"}},
   ak_fs50eco:{facade:1,tDed:4,fDed:-30},
+  ak_op40:{op40:1,F:40,M:40,code:{frame:"8551-8552",bot:"8555-8556",mull:"8583-8584-8582",dframe:"8554",sash:"1931",clip:"8553"},door:{code:"1931"},acc2:[]},
   ak_fs50s:{ssg:1,F:50,M:50,code:{mull:"5006",fr:"5027",sash:"5062",blk:"5094"},acc2:[]},
   ak_fs50k:{acc2:[["AKS681","Cam Destek Takozu 50mm CT 33","field",2],
       ["AKS1243","Cephe Cam Fitili (24mm)","field","gp",1.03,120,{tMax:24}],["AKS1244","Cephe Cam Fitili (9mm)","field","gp",1.03,120,{tMin:25,tMax:28}],["AKS1237","FS50ECO-CF.03","field","gp",1.03,120,{tMin:29}]],
@@ -1964,6 +1966,7 @@ function lkCal(){let ch=false;
     (k.acc||[]).forEach(([code,name,per,qty,applies,pack])=>{s.accs=s.accs||[];if(!s.accs.some(a=>a.code===code))s.accs.push({code,name,price:0,per,qty,applies,minH:0,pack});});
     if(k.slide)Object.assign(s,{hDed:k.hDed,I:k.I,wDed:k.wDed,gW:k.gW,gH:k.gH});
     if(k.facade)Object.assign(s,{fDedW:k.fDed,fDedH:k.fDed,fDed:k.fDed});
+    if(k.op40)Object.assign(s,{name:"Akpa OP40 قواطع مكاتب — مطابق LogiKal",akpa:true,F:40,M:40});
     Object.assign(s,{cal:true,glassCal:true,calDate:"2026-11-17",calBy:"LogiKal — قوائم القص والزجاج الحقيقية"});
     s.lkCalV=LKCAL_V;ch=true;});
   if(ch)save();}
@@ -2063,6 +2066,9 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
   const addC=(name,len,ang,n,type,code)=>{if(n<=0)return;const kgm=code?lkKg(s,code,type):((s.kg||{})[type]||0);
     cut.push({name:code?`${name} · ${code}`:name,len:r1(len),ang,n:n*q,kgm,type,pk:s.id+":"+type,pcode:code||undefined});};
   const addG=(w,h,n,label,fW="",fH="",key="all")=>{const id=infOf(p,key);if(INFILL[id])panels.push({w,h,n:n*q,label,kind:id,name:INFILL[id]});else glass.push({w,h,n:n*q,label,fW,fH,gid:id});};
+  if(k.op40){const O=lkOp40(p);O.cuts.forEach(c=>addC(c.nm,c.L,c.code==="1931"?"45°":"90°",c.n,c.type,c.code));
+    O.glass.forEach(x=>addG(x.w,x.h,1,x.label,x.fW,x.fH,x.key));cut.forEach(c=>{c.kg=c.len/1000*c.n*c.kgm;});
+    {const out={...res,cut,glass,panels};lkAccApply(p,out,s,k,null);return out;}}
   if(k.ssg){const H=p.H,nb=p.cols.length,C2=k.code,o=(e)=>e?32.1:7.1,rD=x=>Math.floor(x+1e-6),G=lkSsg(p);
     G.verts.forEach(v=>addC("قائم 5006 — "+v.nm,v.L,"90°",1,"mull",C2.mull));
     G.hors.forEach(h=>addC(`عارضة 5006 (عمود ${h.b+1})`,h.L,"90°",1,"mull",C2.mull));
@@ -2181,6 +2187,7 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
 };
 try{if(!ST().systems.find(x=>x.id==="ak_fs50k")){const b0=ST().systems.find(x=>x.id==="fs50")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50k",name:"Akpa FS50 كبكلي (غطاء ضغط) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:1.4,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 try{if(!ST().systems.find(x=>x.id==="ak_fs50s")){const b0=ST().systems.find(x=>x.id==="ak_fs50k")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50s",name:"Akpa FS50 سيليكون (SSG) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:0.6,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
+try{if(!ST().systems.find(x=>x.id==="ak_op40")){const b0=ST().systems.find(x=>x.id==="ak_fs50k")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_op40",name:"Akpa OP40 قواطع مكاتب — مطابق LogiKal",akpa:true,F:40,M:40,accs:[],kg:{frame:0.788,mull:0.327,sash:0.688,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 lkCal();
 try{const G=ST().glass;if(!G.find(g=>g.id==="s4"))G.push({id:"s4",ug:5.9,n:"مفرد شفاف 4مم",t:4,price:15000,layers:[4]});
   [["d686","دبل 6/8/6 = 20مم",20,[6,8,6]],["d6106","دبل 6/10/6 = 22مم",22,[6,10,6]],["d6126","دبل 6/12/6 = 24مم",24,[6,12,6]]].forEach(([id,n,t,L])=>{if(!G.find(g=>g.id===id))G.push({id,ug:2.8,n,t,price:(G.find(g=>g.id==="d4164")||{}).price||48000,layers:L});});}catch(_){}
@@ -2249,6 +2256,7 @@ function lkAccCalc(p,g,s,k,C){const out={},add=(code,name,n,unit)=>{if(!(n>0))re
       else if(on==="dcorner")cells.forEach(c=>{const x=cinfo(c);if(x.door)add(code,name,n*(x.ns?2:4),"");});
       else if(on==="doorNS")cells.forEach(c=>{const x=cinfo(c);if(x.door&&x.ns)add(code,name,n,"");});
       else cells.forEach(c=>{const x=cinfo(c);if(!x[on])return;if(o4.minSh&&c.sh<o4.minSh&&(!o4.bh||/^tilt[T]?$/.test(c.fill)))add(o4.alt[0],o4.alt[1],n,"");else add(code,name,n,"");});}});
+  if(k.op40){const O=lkOp40(p);Object.entries(O.acc).forEach(([c,o])=>add(c,o.name,o.n,o.unit));}
   if(k.ssg){const G=lkSsg(p),S=G.verts.reduce((a,v)=>a+v.L,0)+G.hors.reduce((a,h)=>a+h.L,0);
     G.panes.forEach(({w,h})=>{
         add("AKS1239","Epdm Conta (SSG ic)",r2(1.03*(2*(w+h)-295.2)),"م");add("AKS1261","Epdm Conta (SSG dis)",r2(1.03*2*(w+h)),"م");
@@ -2287,6 +2295,61 @@ function lkSdivHtml(p,s){const k=s.lk;let g;try{g=geom(p)}catch(_){return ""}
 function lkSashInf(p,c,M,fc2,x,y,w,h){const key=c.ci+"-"+c.ri,sd=c.sdv,tot=sd.reduce((a,b)=>a+b,0)+(sd.length-1)*M,sc=h/tot;let o="",yy=y;
   sd.forEach((hf,j)=>{const hh=hf*sc;o+=infR(lkSfInf(p,key,j),x,yy,w,hh);yy+=hh;if(j<sd.length-1){o+=`<rect x="${x}" y="${yy}" width="${w}" height="${M*sc}" fill="${fc2}" stroke="#1b1f23" stroke-width="1.2"/>`;yy+=M*sc;}});
   return o;}
+try{Object.assign(LKROLE,{bot:LKROLE.bot||"عتبة / سكة أرضية",dframe:"إطار الباب (8554)",clip:"مشبك تثبيت"});}catch(_){}
+/* ═══ Akpa OP40 (قواطع مكاتب) — مطابق LogiKal (AKA OP 40 (BETA) Single Glass) ═══
+   مُعاير على مشاريع LogiKal 1827/1879 + مواقع اختبار (A1-A3, B1-B2). */
+function lkOp40(p){
+  const inset=p.opDoor==="inset",W=p.W,H=p.H,cols=(p.cols&&p.cols.length?p.cols:[W]).map(Number),nb=cols.length,frameBot=p.opBot==="frame";
+  const R=b=>((p.rows&&p.rows[b])||[H]).map(Number),fill=(b,i)=>String((p.cells||{})[b+"-"+i]||"fixed");
+  const nR=b=>R(b).length,isDoor=b=>fill(b,nR(b)-1).startsWith("door"),anyDoor=cols.some((_,b)=>isDoor(b));
+  const cuts=[],glass=[],acc={},A=(code,name,n,unit)=>{if(!(n>0))return;const o=acc[code]||(acc[code]={name,n:0,unit});o.n+=n;};
+  const C=(nm,L,n,type,code)=>{if(n>0&&L>0)cuts.push({nm,L:Math.round(L*10)/10,n,type,code});};
+  const clip=L=>L<650?1:1+Math.ceil((L-120)/650-1e-9);let nClip=0;
+  const F2=(nm,L)=>{C(nm,L,1,"frame","8551");C(nm,L,1,"frame","8552");nClip+=clip(L);};
+  let s8554=0,s1279=0;const D4=(nm,L,df)=>{C(nm,L,1,"frame","8554");if(df)s1279+=L;else s8554+=L;};const jd=inset?23.8:0;
+  const rows0=R(0),nr0=rows0.length,rBotG=b=>R(b)[nR(b)-1];
+  /* الجوانب */
+  [[0,"يسار"],[nb-1,"يمين"]].forEach(([b,nm])=>{
+    if(isDoor(b)){const rb=nR(b)>1?rBotG(b):H;D4("جانب الباب "+nm+" · 8554",rb-jd);if(H-rb>0)F2("جانب "+nm+" فوق الباب",H-rb);}
+    else F2("جانب "+nm,H);});
+  /* الأعلى */
+  const allTrans=cols.every((_,b)=>nR(b)>1);
+  if(!anyDoor||allTrans)F2("أعلى",W-80-(inset?16.2*cols.filter((_,b)=>isDoor(b)&&(b===0||b===nb-1)).length:0));
+  else cols.forEach((c,b)=>{if(isDoor(b)&&nR(b)===1)return;F2(`أعلى (عمود ${b+1})`,c-(b===0?40:0)-(b===nb-1?40:0));});
+  /* رأس الباب + القوائم الجانبية للباب */
+  cols.forEach((c,b)=>{if(!isDoor(b))return;D4(`رأس الباب (عمود ${b+1}) · 8554`,inset?c-16.2:c);const rb=nR(b)>1?rBotG(b):H;
+    if(b>0&&!isDoor(b-1))D4(`قائم الباب (بين ${b} و${b+1}) · 8554`,rb-jd,inset);
+    if(b<nb-1)D4(`قائم الباب (بين ${b+1} و${b+2}) · 8554`,rb-jd,inset);});
+  /* الأسفل: سكة أرضية أو إطار — مقطّعة بين الأبواب */
+  {let g=[];const flush=()=>{if(!g.length)return;const L=g.reduce((a,b)=>a+cols[b],0)-(g[0]===0?40:0)-(g[g.length-1]===nb-1?40:0);
+      if(frameBot)F2("أسفل"+(anyDoor?` (أعمدة ${g[0]+1}-${g[g.length-1]+1})`:""),L);
+      else{C("سكة أرضية"+(anyDoor?` (أعمدة ${g[0]+1}-${g[g.length-1]+1})`:""),L,1,"other","8555");C("سكة أرضية — إضافي",L,1,"other","8556");}g=[];};
+    cols.forEach((_,b)=>{if(isDoor(b))flush();else g.push(b);});flush();}
+  /* العوارض (مقطّعة لكل عمود، الباب بدون عارضة) */
+  const shift=anyDoor?20:0;
+  cols.forEach((c,b)=>{const rs=R(b);for(let i=0;i<rs.length-1;i++){if(isDoor(b)&&i===rs.length-2)continue;
+      const L=p.opTcont?null:c-(b===0?40:0)-(b===nb-1?40:0);if(L){["8583","8584","8582"].forEach(cd=>C(`عارضة (عمود ${b+1})`,L,1,"mull",cd));}}});
+  if(p.opTcont){const nT=Math.max(0,nr0-1);for(let i=0;i<nT;i++)["8583","8584","8582"].forEach(cd=>C("عارضة مستمرة",W-80,1,"mull",cd));}
+  /* الحقول */
+  cols.forEach((c,b)=>{const rs=R(b),nr=rs.length,re=rs.slice();
+    if(shift&&nr>1){re[nr-1]-=shift;re[nr-2]+=shift;}
+    for(let i=0;i<nr;i++){const f=fill(b,i),key=b+"-"+i,tag=`${b+1}-${i+1}`;
+      if(f.startsWith("door")&&i===nr-1){const rd=nr>1?rs[nr-1]:H,cd=inset?c-16.2:c,sw=Math.round((cd-59.6)*10)/10,sh=Math.round((rd-39.3)*10)/10;
+        C(`زت باب 1931 — أفقي (${tag})`,sw,2,"sash","1931");C(`زت باب 1931 — عمودي (${tag})`,sh,2,"sash","1931");
+        glass.push({w:Math.round(cd-88.8),h:Math.round(rd-68),label:"باب "+tag,key,fW:`عرض الباب ${fmt(cd,1)} − 89`,fH:`${rd} − 68`});
+        A("AKS777","0445B/250 Squadra Zamak Baglanti",4,"");if(!inset)A("A0378","A 0378 Zamak Connection",2,"");continue;}
+      if(f==="open")continue;
+      const wl=b===0,wr=b===nb-1,nw=(wl?1:0)+(wr?1:0),aD=isDoor(b)&&i===nr-2,ce=aD&&inset?c-16.2:c;
+      const w=nw===2?Math.round(ce-51):nw===1?Math.round(ce-18+1e-9):Math.round(ce+14.6);
+      const top=i===0?25.5:10.5,bot=i===nr-1?(frameBot?25.5:83.5):9.5,aboveDoor=isDoor(b)&&i===nr-2;
+      const h=Math.round(re[i]-top-bot-(aboveDoor?3:0));
+      glass.push({w,h,label:"حقل "+tag,key,fW:nw===2?`${c} − 51`:nw===1?`${c} − 18`:`${c} + 15`,fH:`${fmt(re[i],1)} − ${fmt(top+bot+(aboveDoor?3:0),1)}`});
+      let gk;if(aboveDoor)gk=2.06*(w+h-44.5);
+      else{const K=nr===1?(frameBot?159:221.2):i===nr-1?(frameBot?138.8:201):i===0?140:119.8;gk=2.06*(2*c+nw*(re[i]-K));}
+      A("AKS1338","EPDM Conta ICF 30",Math.round(gk/10)/100,"م");}});
+  if(s8554>0)A("AKS1275","EPDM Conta KBF 36",Math.round(1.03*s8554/10)/100,"م");if(s1279>0)A("AKS1279","EPDM Conta KBF 40",Math.round(1.03*s1279/10)/100,"م");
+  if(nClip)C("مشبك تثبيت 8553 (100مم)",100,nClip,"other","8553");
+  return {cuts,glass,acc,nClip};}
 
 /* ═══════════ ترتيب "صفوف أولاً": صف كامل فوگ (فوگ الباب/الشباك) وتحته أعمدة ═══════════
    p.tr=true · p.cols = ارتفاعات الصفوف (من فوگ لجوه) · p.rows[i] = عروض خلايا الصف i (من اليسار) · المفتاح "صف-خلية" */
