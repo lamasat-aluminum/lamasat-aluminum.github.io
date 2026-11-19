@@ -1638,7 +1638,7 @@ document.addEventListener("change",e=>{const t=e.target;if(!t.closest||!t.closes
   else if(t.id==="wzNetC")p.netC=t.checked;
   else if(t.id==="wzMotor")p.motor=t.checked;
   else if(t.id==="wzName"){p.name=t.value;return;}
-  else if(t.id==="wzNC"||t.id==="wzNR"){WZ.nc=Math.max(1,Math.min(99,+$("wzNC").value||1));WZ.nr=Math.max(1,Math.min(99,+$("wzNR").value||1));wzApplyGrid(true);}
+  else if(t.id==="wzNC"||t.id==="wzNR"){WZ.nc=Math.max(1,Math.min(60,+$("wzNC").value||1));WZ.nr=Math.max(1,Math.min(40,+$("wzNR").value||1));wzApplyGrid(true);}
   else if(t.id==="wzQty")p.qty=Math.max(1,+t.value||1);
   else if(t.id==="wzW"){p.W=Math.max(300,+t.value||p.W);if(isGrid(s)){p.cols=wzSplit(p.W,p.cols.length);wzApplyGrid(false);}}
   else if(t.id==="wzH"){p.H=Math.max(300,+t.value||p.H);if(isGrid(s)){const k=WZ.rh.length;WZ.rh=k===1?[p.H]:[...WZ.rh.slice(0,-1)];if(k>1){const sum=WZ.rh.reduce((a,b)=>a+b,0);if(sum>=p.H-150)WZ.rh=wzSplit(p.H,k).slice(0,-1);WZ.rh.push(p.H-WZ.rh.reduce((a,b)=>a+b,0));}wzApplyGrid(false);}}
@@ -1880,7 +1880,7 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=23;
+const LKCAL_V=24;
 const LKCAL={
   ak_wd37:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:19}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:19.1}],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -1945,6 +1945,21 @@ const LKCAL={
       ["AKS693","MS 0102 Tekli Makara Ayarli Pl","sl",2],["AKS1338","EPDM Conta ICF 30","sl","gp",2.06,121.5],["AKS1539","PB 68x80 Kil Fitil","slLin",1.03,{2:[4,6,1236]}],
       ["AKS1912","3-20-80 Orta Cam Takozu","sl",2],["AKS780","26mm Zamak Kose Baglanti 0365","sl",4],["AKS789","MO 19 Ince Kose","sl",8],["AKS799","MS 10 Plastik Stoper (SA-1000)","sl",2]],
     slide:1,hDed:149,I:0,wDed:82,gW:102,gH:101,sHd:1.5,noBead:1,cover:0,code:{frame:"12209",sash:"734",inter:"751"}},
+  ak_cs34:{acc2:[["AKS1531","PB 48x80 Kil Fitil","slLin",1.03,{2:[2,2,0]}],["AKS343","Ust Hava Kesici 15x27 mm","slPos",1],["AKS347","Poupas N3000A Surme Tozluk","slPos",1],["AKS779","19mm Zamak Kose Baglanti 042","slPos",8],["AKS789","MO 19 Ince Kose","slPos",4],
+      ["AKS694","MS 02.04 Aluminyum Ciftli Makara","sl",1],["AKS336","WD9211-MA Surme Stoper","sl",1],["AKS1538","PB 68x70 Kil Fitil","slLin",1.03,{2:[4,6,1062]}],["KS-2100","Glazing Gasket","sl","gp",1.03,95.5],["AKS339","CS 34 Surme Pls Kenet Kapagi","sl",2],["AKS780","26mm Zamak Kose Baglanti 0365","sl",4]],
+    slide:1,hDed:134,I:0,wDed:61.6,gW:117.2,gH:116,sHd:1.4,noBead:1,cover:0,code:{frame:"3641",sash:"10946",inter:"3645"}},
+  ak_s35:{acc2:[["AKS1297","EPDM Conta KRF 05","slLin",1.03,{2:[3,4,36]}],["AKS1536","Firca Fitil (S35T-FC.708)","slLin",1.03,{2:[6,8,1504]}],["AKS780","26mm Zamak Kose Baglanti 0365","slPos",8],["AKS920","Novo Line Tozluk","slPos",2],["AKS1560","S 35 Novo Line Paslanmaz Celik Ray","slPos",1],
+      ["AKS918","S 35 Novo Line Stoper","sl",1],["AKS926","S 35 Novo Line Surme Aluminyum Makara","sl",1],["AKS928","S 35 Novo Line Kanat Sabitleyici","sl",1],["AKS1296","Epdm Conta KRF 04","slLin",1.03,{2:[0,2,148.8]}],["AKS1338","EPDM Conta ICF 30","sl","gp",2.06,104.6],
+      ["AKS914","S 35 Novo Line Kanat Kosesi","sl",1],["AKS915","S 35 Novo Line Kanat Kosesi","sl",1],["AKS916","Spacer (S 35-S 38T icin)","sl",1],["AKS919","S 35 Novo Line Kanat Kapak","sl",2]],
+    slide:1,hDed:74.4,I:0,wDed:27,gW:85.5,gH:147.6,sHd:118.5,vPer:1,noBead:1,cover:0,code:{frame:"5822",sash:"5833",sashV:"5833",sashH:"5824",inter:"5830"}},
+  ak_s32hl:{acc2:[["AKS8128","Alt-Ust Hava Kesici (S32HL)","slPos",2],["AKS1297","EPDM Conta KRF 05","slLin",1.03,{2:[2,2,64]}],["AKS1536","Firca Fitil (S35T-FC.708)","slLin",1.03,{2:[6,8,397]}],["AKS5007","Kose Gonye (KG.125-10)","slPos",4],["AKS780","26mm Zamak Kose Baglanti 0365","slPos",8],["AKS1560","S 35 Novo Line Paslanmaz Celik Ray","slPos",1],
+      ["AKS8130","Aluminyum U Kanalli Cift Makara","sl",1],["AKS1338","EPDM Conta ICF 30","sl","gp",2.06,119],["AKS7980","Kanal Kapama Fitili (KF.21)","slLin",1.03,{2:[0,2,132]}],["AKS8751","Kenet Yalitim Fitili (KYF.05)","slLin",1.03,{2:[0,2,132]}],
+      ["AKS5007","Kose Gonye (KG.125-10)","sl",8],["AKS780","26mm Zamak Kose Baglanti 0365","sl",4],["AKS789","MO 19 Ince Kose","sl",8],["AKS8851","Kanat Stoper (S32HL-HST.32)","sl",1],["AKS919","S 35 Novo Line Kanat Kapak","sl",2]],
+    slide:1,hDed:66,I:0,wDed:-3,gW:102.5,gH:101,sHd:1.5,noBead:1,cover:0,code:{frame:"14177",sash:"14465",inter:"14305"}},
+  ak_isicb:{acc2:[["AKS1536","Firca Fitil (S35T-FC.708)","slLin",1.03,{2:[2,6,998]}],["AKS2288","3,9X25 mm YHB M.U.V","slPos",8],["AKS2774","Isicamli Surme Tozluk","slPos",4],["AKS5791","3 Rayli Kasa Icin Kose Baglanti","slPos",4],
+      ["AKS1940","Sac Surme Teker Ciftli Ayarli","sl",2],["AKS1529","PB 48x45 Kil Fitil","slLin",1.03,{2:[0,2,314]}],["AKS1540","PB 68x100 Kil Fitil","slLin",1.03,{2:[4,0,913.6]}],["AKS2288","3,9X25 mm YHB M.U.V","sl",8],
+      ["AKS2769","Isicamli Surme Etek ve Kenet Kapagi","sl",2],["AKS2770","Isicamli Surme Etek ve Kulplu Kapagi","sl",2],["AKS2771","Isicamli Surme Kulp Kapak Plastigi","sl",2],["AKS2772","Isicamli Surme Rozet","sl",4]],
+    slide:1,hDed:157,I:0,wDed:-2.4,gW:85.2,gH:0,sHd:115.4,vPer:1,fHd:30,adapt:{code:"12670",d:80,n:2},noBead:1,cover:0,code:{frame:"13163",frameH:"13164",sash:"12668",sashV:"12668",sashH:"12666",inter:"12667"}},
   ak_s38t:{acc2:[["AKS462","S 38 Surme Tozluk Plastik","slPos",2],["AKS1297","EPDM Conta KRF 05","slLin",1.03,{2:[2,4,0]}],
       ["AKS780","26mm Zamak Kose Baglanti 0365","slPos",8],["AKS789","MO 19 Ince Kose","slPos",8],
       ["AKS459","S 38 Surme Stoperi Plastik","sl",2],["AKS460","S 38 Surme Kanat Adaptor Klavuzu P","sl",2],
@@ -2127,8 +2142,9 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
       addG(c.gw,c.gh,1,"ثابت جانبي "+tag,`عرض ${fmt(p.W)} − ${(z.dW||0)+z.gW}`,`ارتفاع ${fmt(c.r,1)} − خصم`,"0-"+i);});
     cut.forEach(c=>{c.kg=c.len/1000*c.n*c.kgm;});{const out={...res,cut,glass,panels};lkAccApply(p,out,s,k,null);return out;}}
   if(k.slide&&g.kind==="sliding"){const n=g.n;
-    addC("جرجوب — أفقي",p.W,"45°",2,"frame",C.frame);addC("جرجوب — عمودي",p.H,"45°",2,"frame",C.frame);
-    addC("فردة — أفقي",r1(g.sw-(k.sHd||0)),"45°",2*n,"sash",C.sash);addC("فردة — عمودي",g.sh,"45°",2*n,"sash",C.sash);
+    addC("جرجوب — أفقي",p.W-(k.fHd||0),"45°",2,"frame",C.frameH||C.frame);addC("جرجوب — عمودي",p.H,"45°",2,"frame",C.frame);
+    if(k.adapt)addC("مقوي قفل الجرجوب",p.H-k.adapt.d,"90°",k.adapt.n||2,"frame",k.adapt.code);
+    addC("فردة — أفقي",r1(g.sw-(k.sHd||0)),"45°",2*n,"sash",C.sashH||C.sash);addC("فردة — عمودي",g.sh,"45°",(k.vPer||2)*n,"sash",C.sashV||C.sash);
     if(n>1){const ni=n===4&&k.n4?4:2*(n-1);addC("كلاب (إنترلوك)",g.sh,"90°",ni,"inter",C.inter);if(k.cover)addC("غطاء الكلاب",g.sh,"90°",ni,"cap",C.cover);
       if(n===4&&k.n4)addC("كلاب الوسط",g.sh,"90°",k.n4.n,"inter",k.n4.code);}
     if(!k.noBead){addC("ماسكة زجاج — أفقي",g.sw-k.bW,"90°",2*n,"bead",C.bead);addC("ماسكة زجاج — عمودي",g.sh-k.bH,"90°",2*n,"bead",C.bead);}
@@ -2221,6 +2237,7 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
 };
 try{if(!ST().systems.find(x=>x.id==="ak_fs50k")){const b0=ST().systems.find(x=>x.id==="fs50")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50k",name:"Akpa FS50 كبكلي (غطاء ضغط) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:1.4,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 try{if(!ST().systems.find(x=>x.id==="ak_fs50s")){const b0=ST().systems.find(x=>x.id==="ak_fs50k")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50s",name:"Akpa FS50 سيليكون (SSG) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:0.6,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
+try{if(!ST().systems.find(x=>x.id==="ak_isicb")){const b0=ST().systems.find(x=>x.id==="ak_cs34")||ST().systems.find(x=>x.kind==="sliding");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_isicb",name:"Akpa جرار بلكون عازل (Isicamli) — مطابق LogiKal",akpa:true,accs:[],kg:{frame:1.2,sash:0.9,inter:0.4}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 try{if(!ST().systems.find(x=>x.id==="ak_op40")){const b0=ST().systems.find(x=>x.id==="ak_fs50k")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_op40",name:"Akpa OP40 قواطع مكاتب — مطابق LogiKal",akpa:true,F:40,M:40,accs:[],kg:{frame:0.788,mull:0.327,sash:0.688,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 lkCal();
 try{const G=ST().glass;if(!G.find(g=>g.id==="s4"))G.push({id:"s4",ug:5.9,n:"مفرد شفاف 4مم",t:4,price:15000,layers:[4]});
