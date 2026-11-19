@@ -1880,7 +1880,7 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=24;
+const LKCAL_V=25;
 const LKCAL={
   ak_wd37:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:19}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:19.1}],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -1894,6 +1894,21 @@ const LKCAL={
     grid:1,F:36.5,M:45,frameAlt:{"709":{code:{frame:"709",bead:"771"},accX:[["AKS789","MO 19 Ince Kose","fcorner",1]]}},mBy:{"713":24,"714":45},ov:5.8,bd:22,g0:10,
     win:{sb:82,sbV:126},door:{sb:146,sbV:215,noSill:1,gap:10,bot:146,code:"692",meet:17,meetCode:"760"},doorS:{sbV:190},doorO:{sb:146,sbV:190,code:"691"},rod:1,rodDed:200,rodRe:/^tilt[LR]/,
     code:{frame:"708",sash:"710",mull:"714",bead:"770",bot:"715",rod:"8241"}},
+  ak_wd45:{acc2:[["AKS1253","EPDM Conta Leksan Fitil","glz","bp",1.03,88],["AKS1336","Ic Cam Fitili ICF.20","glz","bp",1.03,88],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
+      ["AKS1277","EPDM Conta KBF.70","win","sp",2.06,0],["AKS1319","Epdm Conta OBF 06","win","sp",1.03,0],["AKS784","MO 42.00490 Zamak Dar Baglanti","win",4],
+      ["AKS784","MO 42.00490 Zamak Dar Baglanti","fcorner",1],["AKS2337","4,2X19 mm YSB Sac Vida","mull",4],["AKS2356","5,5*50 Sac Vidasi / Y.S.B.","mull",4],["AKS793","L Ortakayit Baglantisi","mull",4]],
+    grid:1,F:28.5,M:45,ov:6,bd:22,g0:10,win:{sb:90,sbV:134},rod:1,rodCasV:1,rodDed:200,
+    code:{frame:"746",sash:"747",mull:"749",bead:"793",rod:"8241"}},
+  ak_wd55t:{acc2:[["AKS1254","EPDM Conta DCF 30","glz","bp",1.03,88],["AKS1339","ICF 40 Ic Cam Fitili 4mm","glz","bp",1.03,88],
+      ["AKS1275","EPDM Conta KBF 36","win","sp",1.03,0],["AKS1287","EPDM Conta KBF 56","win","sp",1.03,0],["AKS1321","Epdm Conta OBF.15","win","sp",1.03,42],["75 130103","KT 1661-262 Corner Cleat","win",4],["75 130104","KT 1661-062 Corner Cleat","win",4],
+      ["75 130124","KT 1662-080 Corner Cleat","fcorner",1],["KT 1662 253","Corner Cleat","fcorner",1],["1704-06/28.6","Vertical Connection","mull",2],["1717-18/28.6","Vertical Connection","mull",2]],
+    grid:1,F:27.5,M:42,ov:5,bd:22,g0:10,win:{sb:106,sbV:150},
+    code:{frame:"1700-1768",sash:"1642-1643",mull:"1704-1717",bead:"1699"}},
+  ak_wd62:{acc2:[["AKS1254","EPDM Conta DCF 30","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88],
+      ["AKS1279","EPDM Conta KBF 40","win","sp",2.06,0],["AKS1327","Epdm Conta OBF 50","win","sp",1.03,47],["75 130342","KT 1695-243 Corner Cleat","win",4],["75 130360","KT 3546-167 Corner Cleat","win",4],["AKS789","MO 19 Ince Kose","win",4],
+      ["75 130376","KT 7022-205 Corner Cleat","fcorner",2],["AKS789","MO 19 Ince Kose","fcorner",2],["AKS789","MO 19 Ince Kose","mull",4],["AKS793","L Ortakayit Baglantisi","mull",4]],
+    grid:1,F:37,M:36,ov:6,bd:22,g0:10,win:{sb:107,sbV:151},
+    code:{frame:"3501-3506",sash:"3521-3522",mull:"3512-3513",bead:"2236"}},
   ak_wd50t:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMin:21}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMax:20.9}],
       ["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -2216,7 +2231,7 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
       if(c.noSill)addC("عتبة باب سفلية "+tag,c.sw-t.bot,"90°",1,"sash",C.bot);
       const sdv=c.sdv,sdOn=!!sdv;
       if(!sdOn){addC("ماسكة زجاج — أفقي "+tag,c.sw-t.sb,"90°",2*bx,"bead",C.bead);addC("ماسكة زجاج — عمودي "+tag,c.sh-t.sbV,"90°",2*bx,"bead",C.bead);}
-      if(k.rod&&(k.rodRe||/^tilt/).test(c.fill))addC("تيج (قضيب) "+tag,r1(/^tilt[LR]/.test(c.fill)?c.sh-(k.rodDedLR!=null?k.rodDedLR:(k.rodDed||0)):c.sw-(k.rodDed||0)),"90°",1,"other",C.rod);
+      if(k.rod&&((k.rodRe&&k.rodRe.test?k.rodRe:/^tilt/).test(c.fill)||(k.rodCasV&&/^cas/.test(c.fill))))addC("تيج (قضيب) "+tag,r1((/^tilt[LR]/.test(c.fill)||(k.rodCasV&&/^cas/.test(c.fill)))?c.sh-(k.rodDedLR!=null?k.rodDedLR:(k.rodDed||0)):c.sw-(k.rodDed||0)),"90°",1,"other",C.rod);
       if(sdOn){const iw=c.siw,key=c.ci+"-"+c.ri;
         if(sdv.length>1)addC("تي أفقي داخل الزت "+tag,iw,"90°",sdv.length-1,"mull",C.mull);
         sdv.forEach((hf,j)=>{const ftag=`(${c.ci+1}-${c.ri+1}/${j+1})`,inf=lkSfInf(p,key,j);
@@ -2237,6 +2252,7 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
 };
 try{if(!ST().systems.find(x=>x.id==="ak_fs50k")){const b0=ST().systems.find(x=>x.id==="fs50")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50k",name:"Akpa FS50 كبكلي (غطاء ضغط) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:1.4,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 try{if(!ST().systems.find(x=>x.id==="ak_fs50s")){const b0=ST().systems.find(x=>x.id==="ak_fs50k")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_fs50s",name:"Akpa FS50 سيليكون (SSG) — مطابق LogiKal",akpa:true,F:50,M:50,accs:[],kg:{frame:1.837,mull:1.837,sash:0.6,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
+try{if(!ST().systems.find(x=>x.id==="ak_wd62")){const b0=ST().systems.find(x=>x.id==="ak_wd55t")||ST().systems.find(x=>x.kind==="casement");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_wd62",name:"Akpa WD62 Thermo — مطابق LogiKal",akpa:true,accs:[]});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 try{if(!ST().systems.find(x=>x.id==="ak_isicb")){const b0=ST().systems.find(x=>x.id==="ak_cs34")||ST().systems.find(x=>x.kind==="sliding");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_isicb",name:"Akpa جرار بلكون عازل (Isicamli) — مطابق LogiKal",akpa:true,accs:[],kg:{frame:1.2,sash:0.9,inter:0.4}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 try{if(!ST().systems.find(x=>x.id==="ak_op40")){const b0=ST().systems.find(x=>x.id==="ak_fs50k")||ST().systems.find(x=>x.kind==="facade");if(b0){const b=structuredClone(b0);Object.assign(b,{id:"ak_op40",name:"Akpa OP40 قواطع مكاتب — مطابق LogiKal",akpa:true,F:40,M:40,accs:[],kg:{frame:0.788,mull:0.327,sash:0.688,bead:0}});delete b.lk;delete b.lkCalV;ST().systems.push(b);}}}catch(_){}
 lkCal();
