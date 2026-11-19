@@ -1880,7 +1880,7 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=26;
+const LKCAL_V=27;
 const LKCAL={
   ak_wd37:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:19}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:19.1}],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -1919,6 +1919,21 @@ const LKCAL={
       ["AKS785","Fuji 2000 Zamak Baglanti","fcorner",1],["3546 (17.8)","Corner Cleat PRESS 17.8mm","fcorner",1],["3546 (9.7)","Corner Cleat PRESS 9.7mm","fcorner",1],["1662 (7.7)","Corner Cleat PRESS 7.7mm","win",4],["3088 (25.6)","Corner Cleat Profile 25.6mm","win",4],["3088 (4.5)","Corner Cleat Profile 4.5mm","win",4]],
     grid:1,F:41,M:60,ov:6,bd:22,g0:10,win:{sb:114,sbV:158},rod:1,rodCasV:1,rodDed:150,
     code:{frame:"34-10901-10902",sash:"34-10913-10914",mull:"34-10909-10910",bead:"3537",rod:"8241"}},
+  ak_hvt77t:{acc2:[["AKS1254","EPDM Conta DCF 30","fix","bp",1.03,136],["AKS1339","ICF 40 Ic Cam Fitili 4mm","fix","bp",1.03,136],["AKS749","Cam Yan Destek Takozu","fix",2],["AKS750","Cam Alti Destek Takozu","fix",2],
+      ["AKS1249","Cephe Cam Fitili (15mm)","win","bp",1.03,75],["AKS1335","EPDM Conta GKF 67","win","bp",1.03,75],["AKS1288","EPDM Conta GNL 15","win","sp",1.03,0],["AKS1332","EPDM Conta OBF 77","win","sp",1.03,46],["AKS739","Isi Yalitimli Ispanyolet","win",2],["AKS746","Kanat Ici Kose Gonye","win",4],["KT 1696 242","Corner Cleat","win",4],["KT-2045-5","KT 2045-5mm","win",4],
+      ["AKS748","Kasa Ic Kose Gonye","fcorner",2],["KT-5022-15,20","KT-5022-15,20mm","fcorner",1],["KT-5022-18,80","KT-5022-18,80mm","fcorner",1],["11625-11,5","11625-11,5mm","mull",2],["11626-11,5","11626-11,5mm","mull",2]],
+    grid:1,F:25,M:25,ov:6,bd:47,g0:10,gf:[32.5,55],gs:[86.5,87],fixB2:{code:"11617",dV:50},win:{sb:76.8,sbV:113.4},rod:1,rodCasV:1,rodDed:200,
+    code:{frame:"77-11620-11629",sash:"77-11623-11622",mull:"77-11620-11621",bead:"11616",fbead:"3537",rod:"8241"}},
+  ak_hvt67t:{acc2:[["AKS1254","EPDM Conta DCF 30","fix","bp",1.03,136],["AKS1339","ICF 40 Ic Cam Fitili 4mm","fix","bp",1.03,136],["01140210","Glass Support (5X28X80)","fix",3],["AKS749","Cam Yan Destek Takozu","fix",2],["AKS750","Cam Alti Destek Takozu","fix",2],["AKS751","Kasa Kose Gonye (PVC)","fix",2],["YSB-M3.9X9.5","YSB-M39X9,5","fix",2],
+      ["AKS1335","EPDM Conta GKF 67","win","bp",1.03,75],["CF.05","Epdm Gasket CF 05","win","bp",1.03,75],["AKS1288","EPDM Conta GNL 15","win","sp",1.03,0],["AKS1329","EPDM Conta (OBF.67)","win","sp",1.03,46],["AKS739","Isi Yalitimli Ispanyolet","win",2],["01140210","Glass Support (5X28X80)","win",3],["AKS746","Kanat Ici Kose Gonye","win",4],["KT-1696-24,20","KT-1969 24,20mm","win",4],["KT-2045-5","KT 2045-5mm","win",4],
+      ["AKS748","Kasa Ic Kose Gonye","fcorner",2],["KT-11627-15,20","KT-11627-15,20mm","fcorner",1],["KT-11627-18,80","KT-11627-18,80mm","fcorner",1],["11625-16,5","11625-16,5mm","mull",2],["11626-16,5","11626-16,5mm","mull",2]],
+    grid:1,F:30,M:30,ov:6.1,bd:47,g0:10,gf:[36,63],gs:[87.2,87.2],fixB2:{code:"11617",dV:50},win:{sb:76.8,sbV:113.4},rod:1,rodCasV:1,rodDed:200,
+    code:{frame:"67-11619-11628",sash:"67-11623-11622",mull:"67-11618-11619",bead:"11616",fbead:"3536",rod:"8241"}},
+  ak_pd75t:{acc2:[["AKS1338","EPDM Conta ICF 30","fix","bp",1.03,88],["AKS5002","Dis Cam Fitili (PD75T)","glz","bp",1.03,88],["AKS1916","5x28x80 Kalin Cam Takozu","fix",4],
+      ["AKS1341","EPDM Conta ICF 50","win","bp",1.03,88],["AKS5003","Sapphire 75T Orta Bini Fitili","win","sp",1.03,47],["AKS6638","Kasa Bini Fitili (PD75T)","win","sp",1.03,0],["14772-001","Kose Baglanti Takozu","win",4],["14773-001","Kose Baglanti Takozu","win",4],["AKS5006","Alyanli Kose Onbasi","win",4],["AKS8392","Cam Takozu","win",4],["KG.149","Kose Gonye KG.149","win",4],
+      ["7022-011","19,0 mm Alternatif Kose","fcorner",1],["7022-012","13,0mm Kose Baglanti","fcorner",1],["AKS5006","Alyanli Kose Onbasi","fcorner",1],["AKS8574","Dik Baglanti Seti-Ic","mull",2],["AKS8576","Dik Baglanti Seti-Dis","mull",2]],
+    grid:1,F:45.2,M:45.2,ov:6,bd:22,g0:14,win:{sb:111,sbV:155},rod:1,rodCasV:1,rodDed:200,
+    code:{frame:"75-14191-14192",sash:"75-14748-14749",mull:"75-14191-14193",bead:"3537",fbead:"1747",rod:"8241"}},
   ak_wd50t:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMin:21}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMax:20.9}],
       ["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -2110,10 +2125,10 @@ geom=function(p){const s=sys(p.sys),k=lkK(p,s);if(!k||p.type)return _geom0(p);
         cells.push(c);return;}
       if(fill!=="fixed"&&fill!=="panel"){const ns=door&&noSill&&isBottom,tt0=lkType(k,fill),tt=ns&&k.doorNS?{...tt0,...k.doorNS}:(door&&!ns&&k.doorS&&!fill.startsWith("doorO")?{...tt0,...k.doorS}:tt0),ov=tt.ov!=null?tt.ov:k.ov;
         c.ffW=cw2;c.ffH=ch2;c.sw=r1(cw2+2*ov);c.sh=r1(ns?ch2+ov-(tt.gap||0):ch2+2*ov);if(p.top700&&k.top700&&(tr?b===0:i===0))c.sh=r1(c.sh-k.top700.dH);c.noSill=ns;c.t=tt;
-        const dW=tt.sb+k.g0,dH=r1(tt.sbV-2*k.bd+k.g0);
+        const dW=k.gs&&!door?k.gs[0]:tt.sb+k.g0,dH=k.gs&&!door?k.gs[1]:r1(tt.sbV-2*k.bd+k.g0);
         c.gw=Math.round(c.sw-dW);c.gh=Math.round(c.sh-dH);c.fW=`زت ${fmt(c.sw,1)} − ${dW}`;c.fH=`زت ${fmt(c.sh,1)} − ${dH}`;
         if(k.sdiv){const key=b+"-"+i,sd=lkSdiv(p,key,c.sh-(tt.sbV-2*k.bd),k.M);if(sd.length>1||INFILL[lkSfInf(p,key,0)]){c.sdv=sd;c.siw=r1(c.sw-tt.sb);}}}
-      else if(fill==="fixed"){c.gw=Math.round(cw2-k.g0);c.gh=Math.round(ch2-k.g0);c.fW=`فتحة ${fmt(cw2,1)} − ${k.g0}`;c.fH=`فتحة ${fmt(ch2,1)} − ${k.g0}`;}
+      else if(fill==="fixed"){const gfW=k.gf?k.gf[0]:k.g0,gfH=k.gf?k.gf[1]:k.g0;c.gw=Math.round(cw2-gfW);c.gh=Math.round(ch2-gfH);c.fW=`فتحة ${fmt(cw2,1)} − ${gfW}`;c.fH=`فتحة ${fmt(ch2,1)} − ${gfH}`;if(k.fixB2&&!tr)c.b2={h:(i===0?1:0)+(lastI?1:0),v:(b===0?1:0)+(lastB?1:0)};}
       cells.push(c);});
     if(!lastB){if(!tr){if(!meetBand(b))mV.push(H-(noSill?F+nsB:2*F));}else mH.push(W-2*F);}
   });
@@ -2234,7 +2249,7 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
     let leaves=0;const bx=k.bx||1;
     g.cells.forEach(c=>{const tag=`(${c.ci+1}-${c.ri+1})`;
       if(c.fill==="panel"){addC("حشوة ألمنيوم "+tag,c.cw,"—",1,"panel");return;}
-      if(c.fill==="fixed"){addC("ماسكة زجاج — أفقي "+tag,c.cw,"90°",2*bx,"bead",C.bead);addC("ماسكة زجاج — عمودي "+tag,c.ch-2*k.bd,"90°",2*bx,"bead",C.bead);
+      if(c.fill==="fixed"){const fb=C.fbead||C.bead;addC("ماسكة زجاج — أفقي "+tag,c.cw,"90°",2*bx,"bead",fb);addC("ماسكة زجاج — عمودي "+tag,c.ch-2*k.bd,"90°",2*bx,"bead",fb);if(c.b2){addC("ماسكة خارجية — أفقي "+tag,c.cw,"90°",c.b2.h,"bead",k.fixB2.code);addC("ماسكة خارجية — عمودي "+tag,c.ch-k.fixB2.dV,"90°",c.b2.v,"bead",k.fixB2.code);}
         addG(c.gw,c.gh,1,"ثابت "+tag,c.fW,c.fH,c.ci+"-"+c.ri);return;}
       const door=c.fill.startsWith("door"),t=c.t,sc=door&&p.doorP&&k.door&&(k.door.alts||[]).includes(String(p.doorP))?String(p.doorP):(t.code||C.sash);leaves++;
       addC((door?"زت باب":"زت")+" — أفقي "+tag,c.sw,"45°",c.noSill?1:2,"sash",sc);addC((door?"زت باب":"زت")+" — عمودي "+tag,c.sh,"45°",2,"sash",sc);
