@@ -774,6 +774,7 @@ function renderProps(){
   if(s.lk&&s.lk.door&&s.lk.door.alts&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door"))){const L=[s.lk.door.code,...s.lk.door.alts],v=String(p.doorP||s.lk.door.code);h+=`<div class="fld"><label>مقطع زت الباب</label><select data-k="doorP">${L.map(c=>`<option value="${c}" ${c===v?"selected":""}>${c}</option>`).join("")}</select></div>`;}
   if(s.lk&&s.lk.beadT){const L=[...new Set(s.lk.beadT.map(x=>x[1]))],v=String(p.beadP||"");h+=`<div class="fld"><label>ماسكة الزجاج</label><select data-k="beadP"><option value="" ${!v?"selected":""}>تلقائي حسب سمك الزجاج</option>${L.map(c=>`<option value="${c}" ${c===v?"selected":""}>${c}</option>`).join("")}</select></div>`;}
   if(s.lk&&s.lk.sdiv&&typeof lkSdivHtml==="function")h+=lkSdivHtml(p,s);
+  if(s.lk&&s.lk.ssg&&((p.rows&&p.rows[0])||[]).length>1){h+=`<div class="fld"><label>وصلات القوائم — أرقام خطوط العوارض من فوك (مثال: 2,5,8)</label><input data-k="spliceTxt" value="${esc(p.spliceTxt||"")}" placeholder="فارغ = القائم قطعة وحدة"></div><div class="hint">✔ مثل LogiKal: القائم ينقطع عند الخط (−27مم لكل طرف)، وعارضة الخط تمشي بكل العرض (تتقسم إذا العرض أكثر من 6م).</div>`;}
   if(s.lk&&s.lk.op40){h+=`<div class="fld"><label>أسفل القاطع</label><select data-k="opBot"><option value="track" ${p.opBot!=="frame"?"selected":""}>سكة أرضية 8555+8556</option><option value="frame" ${p.opBot==="frame"?"selected":""}>إطار كامل 8551+8552 (من كل الجهات)</option></select></div><div class="fld"><label>العارضة الأفقية</label><select data-k="opTcont"><option value="" ${!p.opTcont?"selected":""}>مقطّعة لكل عمود (افتراضي LogiKal)</option><option value="1" ${p.opTcont?"selected":""}>مستمرة بطول القاطع</option></select></div>${Object.values(p.cells||{}).some(f=>String(f).startsWith("door"))?`<div class="fld"><label>نوع إطار الباب</label><select data-k="opDoor"><option value="" ${p.opDoor!=="inset"?"selected":""}>إطار باب 8554 كامل (افتراضي LogiKal — Type 4)</option><option value="inset" ${p.opDoor==="inset"?"selected":""}>إطار باب داخلي (مثل مشروع 1827 — رأس 8554 أقصر 16.2)</option></select></div>`:""}<div class="hint">✔ معاير على LogiKal (AKA OP 40): الفاصل بين الأعمدة زجاج على زجاج بدون قائم · الباب يكون بالصف السفلي · مشبك 8553 وجلدة ICF 30 تُحسب تلقائياً.</div>`;}
   if(s.lk&&s.lk.cap){const k=s.lk,mc=p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull;h+=`<div class="fld"><label>مقطع القائم/العارضة</label><select data-k="mullP">${k.mulls.map(c=>`<option value="${c}" ${c===mc?"selected":""}>${c}</option>`).join("")}</select></div><div class="fld"><label>طريقة التجميع</label><select data-k="capV"><option value="0" ${!p.capV?"selected":""}>المحيط الأفقي كامل (القوائم بين المحيط)</option><option value="1" ${p.capV?"selected":""}>القوائم مستمرة — المحيط الأفقي مقطّع بين القوائم</option></select></div><div class="hint">✔ معاير على LogiKal: غطاء ${k.code.fcover} + قائم ${mc} + شريحة ضغط ${k.code.press} · الزجاج = الفتحة + ${k.gAdd}</div>`;}
   if(s.lk&&((s.lk.doorNS&&Object.values(p.cells||{}).some(f=>String(f).startsWith("door")))||(s.lk.fixNS&&!p.arch))){h+=`<div class="fld"><label>عتبة الباب</label><select data-k="noSill"><option value="0" ${!p.noSill?"selected":""}>مع جرجوب سفلي (عتبة)</option><option value="1" ${p.noSill?"selected":""}>بدون عتبة — زت سفلي ${esc((s.lk.code&&s.lk.code.bot)||"")}</option></select></div>`;}
@@ -1879,7 +1880,7 @@ lkFix();
 </script>
 <script>
 /* ═══════════ معايرة LogiKal (قوائم القص والزجاج الحقيقية: OBJ01876 · 01862 · 01831 · 01880 · 01857 · 01855) ═══════════ */
-const LKCAL_V=21;
+const LKCAL_V=22;
 const LKCAL={
   ak_wd37:{acc2:[
       ["AKS1253","EPDM Conta Leksan Fitil DCF 25","glz","bp",1.03,88],["AKS1338","EPDM Conta ICF 30","glz","bp",1.03,88,{tMax:19}],["AKS1341","EPDM Conta ICF 50","glz","bp",1.03,88,{tMin:19.1}],["AKS1912","3-20-80 Orta Cam Takozu","glz",2],
@@ -1994,12 +1995,24 @@ const lkSfInf=(p,key,j)=>{const z=(p.sfinf&&p.sfinf[key])||p["sf_"+key];if(z){co
 /* واجهة FS50 سيليكون: هندسة الأعمدة والعوارض والحقول (الحقل "open" = فتحة بدون زجاج) */
 function lkSsg(p){const H=p.H,cols=p.cols||[p.W],nb=cols.length,o=(e)=>e?32.1:7.1,R=b=>(p.rows&&p.rows[b])||[H],emp=(b,i)=>((p.cells||{})[b+"-"+i]==="open");
   const verts=[],hors=[],panes=[];
-  const topEmpty=(bs)=>{const rs=R(bs[0]);let k=0,sum=0;for(let i=0;i<rs.length;i++){if(bs.every(b=>emp(b,i))){k++;sum+=rs[i];}else break;}return k?r1(H-sum+25):H;};
+  const topEmpty=(bs)=>{const rs=R(bs[0]);let t=0,u=0;for(let i=0;i<rs.length;i++){if(bs.every(b=>emp(b,i)))t+=rs[i];else break;}
+    for(let i=rs.length-1;i>=0;i--){if(bs.every(b=>emp(b,i)))u+=rs[i];else break;}if(t+u>=H)return 0;return (t||u)?r1(H-t-u+(t?25:0)+(u?25:0)):H;};
   verts.push({nm:"محيط يسار",L:topEmpty([0])});verts.push({nm:"محيط يمين",L:topEmpty([nb-1])});
   for(let b=0;b<nb-1;b++)verts.push({nm:"وسطي",L:topEmpty([b,b+1])});
   cols.forEach((c,b)=>{const rs=R(b),n=rs.length,cl=r1(c-(b===0?50:25)-(b===nb-1?50:25)-4),w=r1(c-o(b===0)-o(b===nb-1));
     for(let j=0;j<=n;j++)if((j>0&&!emp(b,j-1))||(j<n&&!emp(b,j)))hors.push({b,L:cl});
     rs.forEach((r,i)=>{if(emp(b,i))return;panes.push({b,i,w,h:r1(r-o(i===0)-o(i===n-1))});});});
+  /* وصلات القوائم (مثل LogiKal: القائم ينقطع عند خط عارضة، والعارضة بهذا الخط تمشي بكل العرض) */
+  const r0=R(0),sp=[...new Set(String(p.spliceTxt||"").split(/[,،\s]+/).map(Number).filter(j=>j>0&&j<r0.length&&Number.isInteger(j)))].sort((a,b)=>a-b);
+  if(sp.length&&!Object.values(p.cells||{}).some(f=>f==="open")&&cols.every((_,b)=>R(b).length===r0.length)){
+    const Y=[0];r0.forEach(r=>Y.push(Y[Y.length-1]+r));const cuts=[0,...sp.map(j=>Y[j]),H],nV=verts.length,nm0=verts.map(v=>v.nm);verts.length=0;
+    nm0.forEach(nm=>{for(let q=0;q<cuts.length-1;q++)verts.push({nm:`${nm} (قطعة ${q+1}/${cuts.length-1})`,L:r1(cuts[q+1]-cuts[q]-(q>0?27:0)-(q<cuts.length-2?27:0))});});
+    const nHB=hors.length;
+    const keep=[];cols.forEach((c,b)=>{for(let j=0;j<=r0.length;j++){if(sp.includes(j))continue;keep.push({b,L:r1(c-(b===0?50:25)-(b===nb-1?50:25)-4)});}});
+    const X=[0];cols.forEach(c=>X.push(X[X.length-1]+c));const W=X[X.length-1],kP=Math.max(1,Math.ceil(W/6000-1e-9)),pts=[0];
+    for(let q=1;q<kP;q++){const t=W*q/kP;let best=X[1];X.slice(1,-1).forEach(x=>{if(Math.abs(x-t)<Math.abs(best-t))best=x;});pts.push(best);}pts.push(W);
+    const spl=[];sp.forEach(j=>{for(let q=0;q<pts.length-1;q++)spl.push({b:-1,j,L:r1(pts[q+1]-pts[q]),sp:1});});
+    return {verts,hors:keep.concat(spl),panes,nHB,nSp:spl.length};}
   return {verts,hors,panes};}
 try{if(typeof FILLS==="object"&&!FILLS.open)FILLS.open="فتحة بدون زجاج (واجهة)";}catch(_){}
 const lkM=(p,s,k)=>{const pc=p.mullP,m=pc&&k.mBy&&k.mBy[lkPc(k,pc)];return m!=null?m:k.M;};
@@ -2077,12 +2090,12 @@ bom=function(p){const s=sys(p.sys),k=lkK(p,s);
     {const out={...res,cut,glass,panels};lkAccApply(p,out,s,k,null);return out;}}
   if(k.ssg){const H=p.H,nb=p.cols.length,C2=k.code,o=(e)=>e?32.1:7.1,rD=x=>Math.floor(x+1e-6),G=lkSsg(p);
     G.verts.forEach(v=>addC("قائم 5006 — "+v.nm,v.L,"90°",1,"mull",C2.mull));
-    G.hors.forEach(h=>addC(`عارضة 5006 (عمود ${h.b+1})`,h.L,"90°",1,"mull",C2.mull));
+    G.hors.forEach(h=>addC(h.sp?`عارضة وصلة 5006 مستمرة (خط ${h.j})`:`عارضة 5006 (عمود ${h.b+1})`,h.L,"90°",1,"mull",C2.mull));
     G.panes.forEach(({b,i,w,h})=>{const tag=`(${b+1}-${i+1})`;
         addC("إطار زجاج 5027 — أفقي "+tag,w,"45°",2,"frame",C2.fr);addC("إطار زجاج 5027 — عمودي "+tag,h,"45°",2,"frame",C2.fr);
         addC("إطار سيليكون 5062 — أفقي "+tag,w,"45°",2,"sash",C2.sash);addC("إطار سيليكون 5062 — عمودي "+tag,h,"45°",2,"sash",C2.sash);
         addC("قطعة 5094 (50مم) "+tag,50,"90°",8,"other",C2.blk);
-        addG(rD(w),rD(h),1,`حقل ${tag}`,`إطار 5027 ${fmt(w,1)}`,`إطار 5027 ${fmt(h,1)}`,b+"-"+i);});
+        addG(rD(w-0.8),rD(h-0.8),1,`حقل ${tag}`,`إطار 5027 ${fmt(w,1)}`,`إطار 5027 ${fmt(h,1)}`,b+"-"+i);});
     cut.forEach(c=>{c.kg=c.len/1000*c.n*c.kgm;});
     {const out={...res,cut,glass,panels};lkAccApply(p,out,s,k,null);return out;}}
   if(k.cap){const F=k.F,M=k.M,W=p.W,H=p.H,nb=p.cols.length,mc=p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull;
@@ -2275,7 +2288,7 @@ function lkAccCalc(p,g,s,k,C){const out={},add=(code,name,n,unit)=>{if(!(n>0))re
         add("AKS1239","Epdm Conta (SSG ic)",r2(1.03*(2*(w+h)-295.2)),"م");add("AKS1261","Epdm Conta (SSG dis)",r2(1.03*2*(w+h)),"م");
         add("01 130156","Kose Takozu",4,"");add("01 130183","Kose Baglanti",4,"");add("20000107","Plastik Kose Alt Takozu",2,"");
         add("AKS2350","4,8x45 Sac Vidasi/Y.S.B.",2*Math.ceil((w-100)/400-1e-9)+2,"");add("AKS2351","Vida (SSG)",2*Math.ceil((h-100)/400-1e-9)+2,"");});
-    const nCon=2*G.hors.length;add("AKS1244","EPDM Conta (5006)",r2(2.06*S),"م");add("AKS1305","EPDM Conta (5006 ic)",r2(1.03*(S+27*nCon)),"م");
+    const nCon=2*(G.nHB!=null?G.nHB:G.hors.length);add("AKS1244","EPDM Conta (5006)",r2(2.06*S),"م");add("AKS1305","EPDM Conta (5006 ic)",r2(1.03*(S+27*(nCon+(G.nSp||0)))),"م");
     add("01 130176","KT 5042-605 Corner Cleat",nCon,"");add("AKS669","80'lik Genlesme Lastigi - Yaka",nCon,"");add("AKS2276","4.8*32 YSB-MU Vida",3*nCon,"");}
   if(k.cap){const cv=!!p.capV,mc=(p.mullP&&k.mulls.includes(String(p.mullP))?String(p.mullP):k.code.mull),is8=mc==="5008";
     const pl=[];(C||[]).forEach(c=>{if(c.pcode===k.code.press)for(let i=0;i<c.n/(p.qty||1);i++)pl.push({len:c.len,h:/أفقي|عارضة|رأس فتحة/.test(c.name),dh:/رأس فتحة/.test(c.name)});});
