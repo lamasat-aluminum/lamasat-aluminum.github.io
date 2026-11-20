@@ -2647,5 +2647,72 @@ async function archiveSync(){
 
 </script>
 
+<script>/*CELLEDIT-V1*/
+(function(){
+const FALLBACK=["fixed","casL","casR","tiltL","tiltR","doorL","doorR"];
+function isEditable(p){if(!p||p.type||p.tr)return false;const s=sys(p.sys);return s&&s.kind!=="sliding"&&s.kind!=="shutter"&&Array.isArray(p.cols)&&Array.isArray(p.rows);}
+function rowsOf(p,ci){return (p.rows[ci]&&p.rows[ci].length)?p.rows[ci]:[p.H];}
+function cellBox(p,ci,ri){let x0=0;for(let i=0;i<ci;i++)x0+=p.cols[i];const rs=rowsOf(p,ci);let y0=0;for(let j=0;j<ri;j++)y0+=rs[j];return {x0,y0,x1:x0+p.cols[ci],y1:y0+rs[ri]};}
+function fixSum(a,T){a=a.map(x=>Math.max(1,Math.round(x)));a[a.length-1]+=T-a.reduce((s,x)=>s+x,0);return a;}
+function remapCols(p,fn){const nc={};Object.entries(p.cells||{}).forEach(([k,v])=>{const [c,r]=k.split("-").map(Number);const t=fn(c,r);if(t)nc[t]=v;});p.cells=nc;}
+function ensureRows(p){if(!Array.isArray(p.rows))p.rows=Object.keys(p.rows||{}).sort((a,b)=>a-b).map(k=>p.rows[k]);p.cols.forEach((_,ci)=>{if(!p.rows[ci]||!p.rows[ci].length)p.rows[ci]=[p.H];});}
+const OPS={
+ splitV(p,ci,ri){ensureRows(p);const w=p.cols[ci];if(w<300)return "العمود ضيق";const a=Math.round(w/2);p.cols.splice(ci,1,a,w-a);
+   const rowsCopy=p.rows[ci].slice();p.rows.splice(ci+1,0,rowsCopy.slice());
+   const old=p.cells;remapCols(p,(c,r)=>c<=ci?c+"-"+r:(c+1)+"-"+r);rowsCopy.forEach((_,r)=>{p.cells[(ci+1)+"-"+r]=old[ci+"-"+r]||"fixed";});return null;},
+ splitH(p,ci,ri){ensureRows(p);const rs=p.rows[ci],hh=rs[ri];if(hh<300)return "الحقل قصير";const a=Math.round(hh/2);rs.splice(ri,1,a,hh-a);
+   const cur=p.cells[ci+"-"+ri]||"fixed";remapCols(p,(c,r)=>c!==ci||r<=ri?c+"-"+r:c+"-"+(r+1));p.cells[ci+"-"+(ri+1)]=cur;p.cells[ci+"-"+ri]="fixed";return null;},
+ mergeR(p,ci,ri){if(ci>=p.cols.length-1)return "ماكو قاطع يمين هذا الحقل";ensureRows(p);p.cols[ci]+=p.cols[ci+1];p.cols.splice(ci+1,1);
+   p.rows.splice(ci+1,1);
+   remapCols(p,(c,r)=>c<=ci?c+"-"+r:(c===ci+1?null:(c-1)+"-"+r));return null;},
+ mergeL(p,ci,ri){if(ci===0)return "ماكو قاطع يسار هذا الحقل";return OPS.mergeR(p,ci-1,ri);},
+ mergeD(p,ci,ri){ensureRows(p);const rs=p.rows[ci];if(ri>=rs.length-1)return "ماكو عارضة تحت هذا الحقل";rs[ri]+=rs[ri+1];rs.splice(ri+1,1);
+   remapCols(p,(c,r)=>c!==ci||r<=ri?c+"-"+r:(r===ri+1?null:c+"-"+(r-1)));return null;},
+ mergeU(p,ci,ri){if(ri===0)return "ماكو عارضة فوق هذا الحقل";const cur=p.cells[ci+"-"+ri];const e=OPS.mergeD(p,ci,ri-1);if(!e&&cur)p.cells[ci+"-"+(ri-1)]=cur;return e;},
+ setW(p,ci,ri,v){if(!(v>100))return "اكتب عرض صحيح";if(p.cols.length<2)return "عرض الحقل = عرض القطعة. غيّر العرض الكلي من الخصائص";const nb=ci<p.cols.length-1?ci+1:ci-1,tot=p.cols[ci]+p.cols[nb];if(v>=tot-100)return "العرض أكبر من المسموح ("+(tot-100)+")";p.cols[ci]=Math.round(v);p.cols[nb]=tot-Math.round(v);return null;},
+ setH(p,ci,ri,v){ensureRows(p);const rs=p.rows[ci];if(!(v>100))return "اكتب ارتفاع صحيح";if(rs.length<2)return "ارتفاع الحقل = ارتفاع القطعة. غيّر الارتفاع الكلي من الخصائص";const nb=ri<rs.length-1?ri+1:ri-1,tot=rs[ri]+rs[nb];if(v>=tot-100)return "الارتفاع أكبر من المسموح ("+(tot-100)+")";rs[ri]=Math.round(v);rs[nb]=tot-Math.round(v);return null;}
+};
+function fillOpts(p,cur){const s=sys(p.sys),door=s.kind==="door"||(s.lk&&s.lk.door);const F=(typeof FILLS!=="undefined"&&FILLS)?FILLS:null;const keys=F?Object.keys(F):FALLBACK;
+  return keys.filter(k=>door||!String(k).startsWith("door")).map(k=>`<option value="${k}" ${cur===k?"selected":""}>${F?F[k]:k}</option>`).join("");}
+let MSG="";
+function decorate(){try{
+  if(typeof VIEW==="undefined"||VIEW!=="elev")return;const p=POS();if(!isEditable(p))return;
+  const wrap=document.getElementById("cadWrap");if(!wrap)return;const svg=wrap.querySelector("svg");if(!svg)return;
+  const NS="http://www.w3.org/2000/svg",gg=document.createElementNS(NS,"g");gg.setAttribute("id","cellHits");
+  let sel=(typeof selCell==="string"?selCell:"0-0").split("-").map(Number);if(!(sel[0]<p.cols.length)||!(sel[1]<rowsOf(p,sel[0]).length)){selCell="0-0";sel=[0,0];}
+  p.cols.forEach((_,ci)=>rowsOf(p,ci).forEach((__,ri)=>{const b=cellBox(p,ci,ri),r=document.createElementNS(NS,"rect");
+    r.setAttribute("x",b.x0);r.setAttribute("y",b.y0);r.setAttribute("width",b.x1-b.x0);r.setAttribute("height",b.y1-b.y0);
+    const on=ci===sel[0]&&ri===sel[1];r.setAttribute("fill",on?"rgba(200,16,46,.10)":"rgba(0,0,0,0)");r.setAttribute("stroke",on?"#c8102e":"none");r.setAttribute("stroke-width",Math.max(4,Math.max(p.W,p.H)/250));r.setAttribute("stroke-dasharray",on?"18 10":"");
+    r.setAttribute("data-hit",ci+"-"+ri);r.style.cursor="pointer";gg.appendChild(r);}));
+  svg.appendChild(gg);
+  const v=document.getElementById("view");let bar=document.getElementById("cellBar");if(bar)bar.remove();bar=document.createElement("div");bar.id="cellBar";
+  const [ci,ri]=sel,b=cellBox(p,ci,ri),cur=p.cells[ci+"-"+ri]||"fixed";
+  bar.style.cssText="position:absolute;left:8px;right:8px;bottom:8px;z-index:5;background:#fff;border:1px solid #c9d1d9;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.85rem;direction:rtl";
+  const B=(op,t,tip)=>`<button type="button" data-cop="${op}" title="${tip||t}" style="padding:4px 9px;border:1px solid #c9d1d9;border-radius:7px;background:#f6f8fa;cursor:pointer">${t}</button>`;
+  bar.innerHTML=`<b style="color:#c8102e">الحقل ${ci+1}-${ri+1}</b>
+   <label>النوع <select data-cfill>${fillOpts(p,cur)}</select></label>
+   <label>عرض <input data-cw type="number" value="${Math.round(b.x1-b.x0)}" style="width:72px"></label>
+   <label>ارتفاع <input data-ch type="number" value="${Math.round(b.y1-b.y0)}" style="width:72px"></label>
+   ${B("splitV","⫴ قسّم عمودي","يضيف قاطع عمودي بنص الحقل")}${B("splitH","☰ قسّم أفقي","يضيف عارضة أفقية بنص الحقل")}
+   ${B("mergeL","⟵ احذف القاطع اليسار")}${B("mergeR","احذف القاطع اليمين ⟶")}${B("mergeU","↑ احذف العارضة فوق")}${B("mergeD","احذف العارضة تحت ↓")}
+   ${B("empty","✕ اجعله ثابت","يرجّع الحقل زجاج ثابت")}
+   <span id="cellMsg" style="color:#c8102e;flex-basis:100%">${MSG}</span>
+   <small style="color:#69727a;flex-basis:100%">اضغط على أي حقل بالرسمة حتى تختاره وتعدّله.</small>`;
+  MSG="";if(getComputedStyle(v).position==="static")v.style.position="relative";v.appendChild(bar);
+ }catch(err){console.warn("celledit",err);}}
+const _rv=renderView;renderView=function(){_rv.apply(this,arguments);decorate();};
+function run(op,val){const p=POS();if(!isEditable(p))return;const [ci,ri]=selCell.split("-").map(Number);let err=null;
+  upd(()=>{if(op==="fill")p.cells[ci+"-"+ri]=val;else if(op==="empty")p.cells[ci+"-"+ri]="fixed";else err=OPS[op](p,ci,ri,val);
+    p.cols=fixSum(p.cols,p.W);ensureRows(p);p.cols.forEach((_,c)=>{p.rows[c]=fixSum(rowsOf(p,c),p.H);});
+    if(op==="mergeR"||op==="mergeL"||op==="mergeU"){const [a,bb]=[op==="mergeL"?Math.max(0,ci-1):ci,op==="mergeU"?Math.max(0,ri-1):ri];if(!err)selCell=a+"-"+Math.min(bb,rowsOf(p,a).length-1);}
+    if(!(+selCell.split("-")[0]<p.cols.length))selCell="0-0";});
+  if(err){MSG=err;renderView();}}
+document.addEventListener("click",e=>{const h=e.target.closest&&e.target.closest("[data-hit]");if(h){selCell=h.getAttribute("data-hit");renderProps();renderView();return;}
+  const b=e.target.closest&&e.target.closest("[data-cop]");if(b){run(b.getAttribute("data-cop"));}},true);
+document.addEventListener("change",e=>{const t=e.target;if(!t.closest||!t.closest("#cellBar"))return;
+  if(t.hasAttribute("data-cfill"))run("fill",t.value);else if(t.hasAttribute("data-cw"))run("setW",+t.value);else if(t.hasAttribute("data-ch"))run("setH",+t.value);},true);
+try{renderView();}catch(_){}
+})();
+</script>
 </body>
 </html>
